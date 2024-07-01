@@ -21,15 +21,20 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import epg.documents.ChannelDoc;
+import epg.documents.ProgrammeDoc;
 import epg.repos.ChannelRepo;
+import epg.repos.ProgrammeRepo;
 import epg.xml.Channel;
-import epg.xml.DisplayName;
+import epg.xml.Programme;
 
 @SpringBootApplication
 public class BatchFileImport {
 
 	@Autowired
 	private ChannelRepo channelRepo;
+
+	@Autowired
+	private ProgrammeRepo programmeRepo;
 
 	@Value("${epg.batch.importFile}")
 	private Resource importFile;
@@ -43,7 +48,10 @@ public class BatchFileImport {
 		Step importChannelsStep = importStep(jobRepository, transactionManager, channelReader(importFile),
 				writer(channelRepo), channelProcessor(), "importChannelsStep");
 
-		return new JobBuilder("importFileJob", jobRepository).start(importChannelsStep).build();
+		Step importProgsStep = importStep(jobRepository, transactionManager, progReader(importFile),
+				writer(programmeRepo), progProcessor(), "importChannelsStep");
+
+		return new JobBuilder("importFileJob", jobRepository).start(importProgsStep).next(importChannelsStep).build();
 
 	}
 
@@ -54,9 +62,22 @@ public class BatchFileImport {
 			public ChannelDoc process(Channel item) throws Exception {
 				ChannelDoc channelDoc = new ChannelDoc();
 				channelDoc.setDisplayName(item.getDisplayName().getValue());
-				channelDoc.setId(item.getDisplayName().getValue());
+				channelDoc.setId(item.getId());
 				channelDoc.setUrl(item.getUrl());
 				return channelDoc;
+			}
+		};
+	}
+
+	private ItemProcessor<Programme, ProgrammeDoc> progProcessor() {
+		return new ItemProcessor<Programme, ProgrammeDoc>() {
+
+			@Override
+			public ProgrammeDoc process(Programme item) throws Exception {
+				ProgrammeDoc doc = new ProgrammeDoc();
+				// doc.set
+
+				return doc;
 			}
 		};
 	}
@@ -71,12 +92,21 @@ public class BatchFileImport {
 	private ItemReader<Channel> channelReader(Resource inputFile) {
 
 		Jaxb2Marshaller channelMarshaller = new Jaxb2Marshaller();
-		channelMarshaller.setClassesToBeBound(Channel.class, DisplayName.class);
+		channelMarshaller.setClassesToBeBound(Channel.class);
 		channelMarshaller.setMappedClass(Channel.class);
-		// channelMarshaller.setPackagesToScan("epg.xml");
 
 		return new StaxEventItemReaderBuilder<Channel>().name("channelReader").resource(inputFile)
 				.addFragmentRootElements("channel").unmarshaller(channelMarshaller).build();
+	}
+
+	private ItemReader<Programme> progReader(Resource inputFile) {
+
+		Jaxb2Marshaller channelMarshaller = new Jaxb2Marshaller();
+		channelMarshaller.setClassesToBeBound(Programme.class);
+		channelMarshaller.setMappedClass(Programme.class);
+
+		return new StaxEventItemReaderBuilder<Programme>().name("progReader").resource(inputFile)
+				.addFragmentRootElements("programme").unmarshaller(channelMarshaller).build();
 	}
 
 	private <T, ID> ItemWriter<T> writer(ElasticsearchRepository<T, ID> repo) {

@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Document(indexName = "programme")
-public class Programme {
+public class ProgrammeDoc {
 
 	@Id
 	@Field(name = "channel", type = FieldType.Keyword)
