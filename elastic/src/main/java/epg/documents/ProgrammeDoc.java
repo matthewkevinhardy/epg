@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -12,13 +13,16 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 public class ProgrammeDoc {
 
 	@Id
+	@Field(name = "progId", type = FieldType.Keyword)
+	private String progId;
+
 	@Field(name = "channel", type = FieldType.Keyword)
 	private String channel;
 
-	@Field(name = "start", type = FieldType.Date)
+	@Field(name = "start", type = FieldType.Date, format = DateFormat.date_hour_minute, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
 	private LocalDateTime start;
 
-	@Field(name = "stop", type = FieldType.Date)
+	@Field(name = "stop", type = FieldType.Date, format = DateFormat.date_hour_minute, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
 	private LocalDateTime stop;
 
 	@Field(name = "title", type = FieldType.Keyword)
@@ -131,6 +135,14 @@ public class ProgrammeDoc {
 
 	public void setRatingValue(String ratingValue) {
 		this.ratingValue = ratingValue;
+	}
+
+	public String getProgId() {
+		return progId;
+	}
+
+	public void setProgId(String progId) {
+		this.progId = progId;
 	}
 
 }
