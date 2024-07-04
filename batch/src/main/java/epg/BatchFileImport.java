@@ -1,11 +1,15 @@
 package epg;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -51,6 +55,9 @@ public class BatchFileImport {
 	@Value("${epg.batch.importFile}")
 	private Resource importFile;
 
+	@Value("${epg.batch.fileUrl}")
+	private Resource fileUrl;
+
 	// 2024 07 03 223000 +0000
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss Z");
 
@@ -60,15 +67,18 @@ public class BatchFileImport {
 
 	@Bean
 	public Job importFileJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-//		Step importChannelsStep = importStep(jobRepository, transactionManager, channelReader(importFile),
-//				writer(channelRepo), channelProcessor(), "importChannelsStep");
+		Step importChannelsStep = importStep(jobRepository, transactionManager, channelReader(importFile),
+				writer(channelRepo), channelProcessor(), "importChannelsStep");
 
 		Step importProgsStep = importStep(jobRepository, transactionManager, progReader(importFile),
-				writer(programmeRepo), progProcessor(), "importChannelsStep");
+				writer(programmeRepo), progProcessor(), "importProgsStep");
 
 		return new JobBuilder("importFileJob", jobRepository)
-				.start(deleteStep(jobRepository, transactionManager, programmeRepo, "delete prog"))
-				.next(importProgsStep).build();
+				.start(downloadFileAndUnzipStep(jobRepository, transactionManager))
+				.next(deleteStep(jobRepository, transactionManager, programmeRepo, "delete prog"))
+				.next(deleteStep(jobRepository, transactionManager, channelRepo, "delete channel"))
+				// .next(importChannelsStep)
+				.next(importProgsStep).next(deleteFileStep(jobRepository, transactionManager)).build();
 
 	}
 
@@ -175,4 +185,40 @@ public class BatchFileImport {
 			}
 		}, transactionManager).build();
 	}
+
+	private <T, ID> Step downloadFileAndUnzipStep(JobRepository jobRepository,
+			PlatformTransactionManager transactionManager) {
+
+		return new StepBuilder("download file", jobRepository).tasklet(new Tasklet() {
+
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				File outputFile = new File(importFile.getFile().getParent(), fileUrl.getFilename());
+
+				FileUtils.copyURLToFile(fileUrl.getURL(), outputFile);
+
+				FileInputStream fis = new FileInputStream(outputFile);
+				GZIPInputStream gis = new GZIPInputStream(fis);
+				FileUtils.copyInputStreamToFile(gis, importFile.getFile().getAbsoluteFile());
+
+				return RepeatStatus.FINISHED;
+			}
+		}, transactionManager).build();
+	}
+
+	private <T, ID> Step deleteFileStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+
+		return new StepBuilder("delete file", jobRepository).tasklet(new Tasklet() {
+
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				File outputFile = new File(importFile.getFile().getParent(), fileUrl.getFilename());
+				outputFile.delete();
+				importFile.getFile().delete();
+
+				return RepeatStatus.FINISHED;
+			}
+		}, transactionManager).build();
+	}
+
 }

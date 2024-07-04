@@ -19,10 +19,10 @@ public class ProgrammeDoc {
 	@Field(name = "channel", type = FieldType.Keyword)
 	private String channel;
 
-	@Field(name = "start", type = FieldType.Date, format = DateFormat.date_hour_minute, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+	@Field(name = "start", type = FieldType.Date, format = DateFormat.date_hour_minute_second, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
 	private LocalDateTime start;
 
-	@Field(name = "stop", type = FieldType.Date, format = DateFormat.date_hour_minute, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+	@Field(name = "stop", type = FieldType.Date, format = DateFormat.date_hour_minute_second, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
 	private LocalDateTime stop;
 
 	@Field(name = "title", type = FieldType.Keyword)
