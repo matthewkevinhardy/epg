@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
@@ -58,7 +56,6 @@ public class BatchFileImport {
 	@Value("${epg.batch.fileUrl}")
 	private Resource fileUrl;
 
-	// 2024 07 03 223000 +0000
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss Z");
 
 	public static void main(String[] args) {
@@ -75,13 +72,18 @@ public class BatchFileImport {
 
 		return new JobBuilder("importFileJob", jobRepository)
 				.start(downloadFileAndUnzipStep(jobRepository, transactionManager))
-				.next(deleteStep(jobRepository, transactionManager, programmeRepo, "delete prog"))
-				.next(deleteStep(jobRepository, transactionManager, channelRepo, "delete channel"))
+				.next(deleteRepoStep(jobRepository, transactionManager, programmeRepo, "delete prog"))
+				.next(deleteRepoStep(jobRepository, transactionManager, channelRepo, "delete channel"))
 				// .next(importChannelsStep)
 				.next(importProgsStep).next(deleteFileStep(jobRepository, transactionManager)).build();
 
 	}
 
+	/**
+	 * Process channel xml
+	 * 
+	 * @return
+	 */
 	private ItemProcessor<Channel, ChannelDoc> channelProcessor() {
 		return new ItemProcessor<Channel, ChannelDoc>() {
 
@@ -96,9 +98,11 @@ public class BatchFileImport {
 		};
 	}
 
-	private Set<String> keys = new HashSet<>();
-	private int counter = 0;
-
+	/**
+	 * Process programme xml
+	 * 
+	 * @return
+	 */
 	private ItemProcessor<Programme, ProgrammeDoc> progProcessor() {
 		return new ItemProcessor<Programme, ProgrammeDoc>() {
 
@@ -107,12 +111,6 @@ public class BatchFileImport {
 				ProgrammeDoc doc = new ProgrammeDoc();
 
 				doc.setProgId(item.getChannel() + item.getStart() + item.getStop());
-
-				if (keys.add(doc.getProgId())) {
-					counter++;
-				} else {
-					System.err.println(counter++);
-				}
 
 				if (item.getCatagories() != null)
 					doc.setCategory(item.getCatagories().stream().map(Category::getValue).collect(Collectors.toList()));
@@ -136,6 +134,19 @@ public class BatchFileImport {
 		};
 	}
 
+	/**
+	 * Create an import step
+	 * 
+	 * @param <I>
+	 * @param <O>
+	 * @param jobRepository
+	 * @param transactionManager
+	 * @param reader
+	 * @param writer
+	 * @param itemProcessor
+	 * @param stepName
+	 * @return
+	 */
 	private <I, O> Step importStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
 			ItemReader<I> reader, ItemWriter<O> writer, ItemProcessor<I, O> itemProcessor, String stepName) {
 
@@ -143,6 +154,12 @@ public class BatchFileImport {
 				.reader(reader).writer(writer).build();
 	}
 
+	/**
+	 * Read the channels xml
+	 * 
+	 * @param inputFile
+	 * @return
+	 */
 	private ItemReader<Channel> channelReader(Resource inputFile) {
 
 		Jaxb2Marshaller channelMarshaller = new Jaxb2Marshaller();
@@ -153,6 +170,12 @@ public class BatchFileImport {
 				.addFragmentRootElements("channel").unmarshaller(channelMarshaller).build();
 	}
 
+	/**
+	 * Read the programmes xml
+	 * 
+	 * @param inputFile
+	 * @return
+	 */
 	private ItemReader<Programme> progReader(Resource inputFile) {
 
 		Jaxb2Marshaller channelMarshaller = new Jaxb2Marshaller();
@@ -163,6 +186,14 @@ public class BatchFileImport {
 				.addFragmentRootElements("programme").unmarshaller(channelMarshaller).build();
 	}
 
+	/**
+	 * Write to repo
+	 * 
+	 * @param <T>
+	 * @param <ID>
+	 * @param repo
+	 * @return
+	 */
 	private <T, ID> ItemWriter<T> writer(ElasticsearchRepository<T, ID> repo) {
 		return new ItemWriter<T>() {
 
@@ -173,7 +204,18 @@ public class BatchFileImport {
 		};
 	}
 
-	private <T, ID> Step deleteStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+	/**
+	 * Clear out the repo
+	 * 
+	 * @param <T>
+	 * @param <ID>
+	 * @param jobRepository
+	 * @param transactionManager
+	 * @param repo
+	 * @param stepName
+	 * @return
+	 */
+	private <T, ID> Step deleteRepoStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
 			ElasticsearchRepository<T, ID> repo, String stepName) {
 
 		return new StepBuilder(stepName, jobRepository).tasklet(new Tasklet() {
@@ -186,6 +228,15 @@ public class BatchFileImport {
 		}, transactionManager).build();
 	}
 
+	/**
+	 * Download file and unzip
+	 * 
+	 * @param <T>
+	 * @param <ID>
+	 * @param jobRepository
+	 * @param transactionManager
+	 * @return
+	 */
 	private <T, ID> Step downloadFileAndUnzipStep(JobRepository jobRepository,
 			PlatformTransactionManager transactionManager) {
 
@@ -206,6 +257,15 @@ public class BatchFileImport {
 		}, transactionManager).build();
 	}
 
+	/**
+	 * Delete the files
+	 * 
+	 * @param <T>
+	 * @param <ID>
+	 * @param jobRepository
+	 * @param transactionManager
+	 * @return
+	 */
 	private <T, ID> Step deleteFileStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 
 		return new StepBuilder("delete file", jobRepository).tasklet(new Tasklet() {
