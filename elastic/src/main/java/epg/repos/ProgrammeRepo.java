@@ -31,5 +31,13 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 	public Optional<ProgrammeDoc> findByChannelAndStartLessThanAndStopGreaterThan(String channel, LocalDateTime toStart,
 			LocalDateTime fromStop);
 
+	public Page<ProgrammeDoc> findByChannelAndStopGreaterThanAndStopLessThan(String channel, LocalDateTime toStart,
+			LocalDateTime fromStop, Pageable pageable);
+
 	public Page<ProgrammeDoc> findByChannel(String channel, Pageable pageable);
+
+	public Page<ProgrammeDoc> findByDescription(String description, Pageable pageable);
+
+	public Page<ProgrammeDoc> findByDescriptionAndDescriptionLang(String description, String descriptionLang,
+			Pageable pageable);
 }

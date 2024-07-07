@@ -35,11 +35,11 @@ public class Channel {
 		this.url = url;
 	}
 
+	@XmlElement(name = "display-name")
 	public DisplayName getDisplayName() {
 		return displayName;
 	}
 
-	@XmlElement(name = "display-name")
 	public void setDisplayName(DisplayName displayName) {
 		this.displayName = displayName;
 	}
@@ -48,7 +48,7 @@ public class Channel {
 		return icons;
 	}
 
-	@XmlElement(name = "icon")
+	@XmlElement(name = "icon", required = false)
 	public void setIcon(List<Icon> icons) {
 		this.icons = icons;
 	}

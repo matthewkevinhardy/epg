@@ -20,7 +20,6 @@ public class DisplayName {
 		this.lang = lang;
 	}
 
-	@XmlValue
 	public String getValue() {
 		return value;
 	}

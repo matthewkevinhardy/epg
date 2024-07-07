@@ -15,7 +15,7 @@ public class ChannelDoc {
 	@Field(name = "displayName", type = FieldType.Keyword)
 	private String displayName;
 
-	@Field(name = "url", type = FieldType.Text)
+	@Field(name = "url", type = FieldType.Keyword)
 	private String url;
 
 	public String getId() {

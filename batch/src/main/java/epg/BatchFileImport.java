@@ -74,8 +74,8 @@ public class BatchFileImport {
 				.start(downloadFileAndUnzipStep(jobRepository, transactionManager))
 				.next(deleteRepoStep(jobRepository, transactionManager, programmeRepo, "delete prog"))
 				.next(deleteRepoStep(jobRepository, transactionManager, channelRepo, "delete channel"))
-				// .next(importChannelsStep)
-				.next(importProgsStep).next(deleteFileStep(jobRepository, transactionManager)).build();
+				.next(importChannelsStep).next(importProgsStep).next(deleteFileStep(jobRepository, transactionManager))
+				.build();
 
 	}
 
@@ -116,8 +116,10 @@ public class BatchFileImport {
 					doc.setCategory(item.getCatagories().stream().map(Category::getValue).collect(Collectors.toList()));
 				doc.setChannel(item.getChannel());
 				// doc.getCountry(item.get)
-				if (item.getDescription() != null)
+				if (item.getDescription() != null) {
 					doc.setDescription(item.getDescription().getValue());
+					doc.setDescriptionLang(item.getDescription().getLang());
+				}
 				if (item.getIcon() != null)
 					doc.setIcon(item.getIcon().getSrc());
 				// doc.setPreviouslyShown(item.get);
@@ -163,7 +165,7 @@ public class BatchFileImport {
 	private ItemReader<Channel> channelReader(Resource inputFile) {
 
 		Jaxb2Marshaller channelMarshaller = new Jaxb2Marshaller();
-		channelMarshaller.setClassesToBeBound(Channel.class, Icon.class);
+		channelMarshaller.setClassesToBeBound(Channel.class);
 		channelMarshaller.setMappedClass(Channel.class);
 
 		return new StaxEventItemReaderBuilder<Channel>().name("channelReader").resource(inputFile)

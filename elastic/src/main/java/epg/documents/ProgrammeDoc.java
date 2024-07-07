@@ -28,8 +28,11 @@ public class ProgrammeDoc {
 	@Field(name = "title", type = FieldType.Keyword)
 	private String title;
 
-	@Field(name = "description", type = FieldType.Keyword)
+	@Field(name = "description", type = FieldType.Text)
 	private String description;
+
+	@Field(name = "description-lang", type = FieldType.Keyword)
+	private String descriptionLang;
 
 	@Field(name = "category", type = FieldType.Keyword)
 	private List<String> category;
@@ -87,6 +90,14 @@ public class ProgrammeDoc {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getDescriptionLang() {
+		return descriptionLang;
+	}
+
+	public void setDescriptionLang(String descriptionLang) {
+		this.descriptionLang = descriptionLang;
 	}
 
 	public List<String> getCategory() {
