@@ -25,8 +25,8 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 	// @Query(" { \"bool\" : { \"must\" : [ { \"query_string\" : { \"query\" :
 	// \"?0\", \"fields\" : [ \"channel\" ] } }, { \"query_string\" : { \"range\": {
 	// \"start\": { \"gte\": \"?1\", \"lte\": \"?2\" } } } } ] } }")
-	public Page<ProgrammeDoc> findByChannelAndStartBetween(String channel, LocalDateTime fromStart,
-			LocalDateTime toStart, Pageable pageable);
+	public Page<ProgrammeDoc> findByChannelAndStartBetweenOrStopBetween(String channel, LocalDateTime fromStart,
+			LocalDateTime toStart, LocalDateTime fromStop, LocalDateTime toStop, Pageable pageable);
 
 	public Optional<ProgrammeDoc> findByChannelAndStartLessThanAndStopGreaterThan(String channel, LocalDateTime toStart,
 			LocalDateTime fromStop);

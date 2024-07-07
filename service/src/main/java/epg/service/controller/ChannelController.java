@@ -28,4 +28,10 @@ public class ChannelController {
 
 		return channelRepo.findByDisplayName(channel, pageable);
 	}
+
+	@GetMapping(produces = APPLICATION_JSON_VALUE)
+	public Page<ChannelDoc> all(Pageable pageable) {
+
+		return channelRepo.findAll(pageable);
+	}
 }

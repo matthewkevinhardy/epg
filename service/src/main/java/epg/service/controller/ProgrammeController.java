@@ -43,12 +43,9 @@ public class ProgrammeController {
 
 	@GetMapping(path = "/{channel}/nextHour", produces = APPLICATION_JSON_VALUE)
 	public Page<ProgrammeDoc> byChannel(@PathVariable String channel, Pageable pageable) {
+		return programmeRepo.findByChannelAndStartBetweenOrStopBetween(channel, LocalDateTime.now(),
+				LocalDateTime.now().plusHours(1), LocalDateTime.now(), LocalDateTime.now().plusHours(1), pageable);
 
-//		return programmeRepo.findByChannelAndStartBetween(channel, LocalDateTime.now(),
-//				LocalDateTime.now().plusHours(1), pageable);
-
-		return programmeRepo.findByChannelAndStopGreaterThanAndStopLessThan(channel, LocalDateTime.now(),
-				LocalDateTime.now().plusHours(1), pageable);
 	}
 
 	@GetMapping(path = "/{channel}/now", produces = APPLICATION_JSON_VALUE)
@@ -61,7 +58,9 @@ public class ProgrammeController {
 	@GetMapping(path = "/{channel}/today", produces = APPLICATION_JSON_VALUE)
 	public Page<ProgrammeDoc> today(@PathVariable String channel, Pageable pageable) {
 
-		return programmeRepo.findByChannelAndStartBetween(channel,
+		return programmeRepo.findByChannelAndStartBetweenOrStopBetween(channel,
+				LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT),
+				LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT),
 				LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT),
 				LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT), pageable);
 	}
