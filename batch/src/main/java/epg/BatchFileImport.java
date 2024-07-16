@@ -82,7 +82,8 @@ public class BatchFileImport {
 				// .next(deleteRepoStep(jobRepository, transactionManager, channelRepo, "delete
 				// channel"))
 				// .next(importChannelsStep).next(importProgsStep)
-				.next(deleteFilesStep(jobRepository, transactionManager)).build();
+				// .next(deleteFilesStep(jobRepository, transactionManager))
+				.build();
 
 	}
 
