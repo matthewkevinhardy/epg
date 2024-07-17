@@ -2,6 +2,7 @@ package epg;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -29,6 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -45,6 +48,9 @@ import epg.xml.Programme;
 
 @SpringBootApplication
 public class BatchFileImport {
+
+	private static final org.apache.logging.log4j.Logger LOG = org.apache.logging.log4j.LogManager
+			.getLogger(BatchFileImport.class);
 
 	@Autowired
 	private ChannelRepo channelRepo;
@@ -69,22 +75,30 @@ public class BatchFileImport {
 
 	@Bean
 	public Job importFileJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-//		Step importChannelsStep = importStep(jobRepository, transactionManager, channelReader(importFile),
-//				writer(channelRepo), channelProcessor(), "importChannelsStep");
-//
-//		Step importProgsStep = importStep(jobRepository, transactionManager, progReader(importFile),
-//				writer(programmeRepo), progProcessor(), "importProgsStep");
-
-		return new JobBuilder("importFileJob", jobRepository)
+		SimpleJobBuilder simpleJobBuilder = new JobBuilder("importFileJob", jobRepository)
 				.start(downloadFilesAndUnzipStep(jobRepository, transactionManager))
-				// .next(deleteRepoStep(jobRepository, transactionManager, programmeRepo,
-				// "delete prog"))
-				// .next(deleteRepoStep(jobRepository, transactionManager, channelRepo, "delete
-				// channel"))
-				// .next(importChannelsStep).next(importProgsStep)
-				// .next(deleteFilesStep(jobRepository, transactionManager))
-				.build();
+				.next(deleteRepoStep(jobRepository, transactionManager, programmeRepo, "delete prog"))
+				.next(deleteRepoStep(jobRepository, transactionManager, channelRepo, "delete channel"));
 
+		importFiles.stream().forEach(fileName -> {
+			try {
+				FileUrlResource file = new FileUrlResource(importDir + "/" + fileName.replace(".gz", ""));
+				Step importChannelsStep = importStep(jobRepository, transactionManager, channelReader(file),
+						writer(channelRepo), channelProcessor(), "importChannelsStep: " + fileName);
+				Step importProgsStep = importStep(jobRepository, transactionManager, progReader(file),
+						writer(programmeRepo), progProcessor(), "importProgsStep: " + fileName);
+
+				simpleJobBuilder.next(importChannelsStep);
+				simpleJobBuilder.next(importProgsStep);
+			} catch (MalformedURLException e) {
+				LOG.error(e);
+			}
+
+		});
+
+		simpleJobBuilder.next(deleteFilesStep(jobRepository, transactionManager));
+
+		return simpleJobBuilder.build();
 	}
 
 	/**
@@ -266,6 +280,8 @@ public class BatchFileImport {
 						FileInputStream fis = new FileInputStream(gzFile);
 						GZIPInputStream gis = new GZIPInputStream(fis);
 						FileUtils.copyInputStreamToFile(gis, unzipFile);
+
+						LOG.info("Got file: " + unzipFile.getCanonicalPath());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -295,7 +311,9 @@ public class BatchFileImport {
 					File gzFile = new File(importDir + "/" + fileName);
 					File unzipFile = new File(importDir + "/" + fileName.replace(".gz", ""));
 					gzFile.delete();
+					LOG.info("Deleted file: " + gzFile.getAbsolutePath());
 					unzipFile.delete();
+					LOG.info("Deleted file: " + unzipFile.getAbsolutePath());
 				});
 
 				return RepeatStatus.FINISHED;
