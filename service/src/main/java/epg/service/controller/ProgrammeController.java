@@ -2,12 +2,8 @@ package epg.service.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Optional;
 
-import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import epg.documents.ProgrammeDoc;
-import epg.repos.ProgrammeRepo;
+import epg.service.service.ProgrammeService;
 
 @RestController
 @RequestMapping("/v1/programme")
@@ -29,53 +25,43 @@ public class ProgrammeController {
 			.getLogger(ProgrammeController.class);
 
 	@Autowired
-	private ProgrammeRepo programmeRepo;
+	private ProgrammeService programmeService;
 
 	@GetMapping(path = "/description/{desc}", produces = APPLICATION_JSON_VALUE)
 	public Page<ProgrammeDoc> byDescription(@PathVariable String desc, @RequestParam(required = false) String lang,
 			Pageable pageable) {
 
-		if (!TextUtils.isBlank(lang)) {
-			return programmeRepo.findByDescriptionAndDescriptionLang(desc, lang, pageable);
-		}
-
-		return programmeRepo.findByDescription(desc, pageable);
+		return programmeService.byDescription(desc, lang, pageable);
 	}
 
-	// Lifetime.HD.uk20240717000000 +000020240717020000 +0000
 	@GetMapping(path = "/id/{id}", produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<ProgrammeDoc> byId(@PathVariable String id) {
 
-		return ResponseEntity.of(programmeRepo.findById(id));
+		return programmeService.byId(id);
 	}
 
 	@GetMapping(path = "/{channel}/nextHour", produces = APPLICATION_JSON_VALUE)
 	public Page<ProgrammeDoc> byChannel(@PathVariable String channel, Pageable pageable) {
-		return programmeRepo.findByChannelAndStartBetweenOrStopBetween(channel, LocalDateTime.now(),
-				LocalDateTime.now().plusHours(1), LocalDateTime.now(), LocalDateTime.now().plusHours(1), pageable);
+
+		return programmeService.byChannel(channel, pageable);
 
 	}
 
 	@GetMapping(path = "/{channel}/now", produces = APPLICATION_JSON_VALUE)
 	public Optional<ProgrammeDoc> now(@PathVariable String channel, Pageable pageable) {
 
-		return programmeRepo.findByChannelAndStartLessThanAndStopGreaterThan(channel, LocalDateTime.now(),
-				LocalDateTime.now());
+		return programmeService.now(channel, pageable);
 	}
 
 	@GetMapping(path = "/{channel}/today", produces = APPLICATION_JSON_VALUE)
 	public Page<ProgrammeDoc> today(@PathVariable String channel, Pageable pageable) {
 
-		return programmeRepo.findByChannelAndStartBetweenOrStopBetween(channel,
-				LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT),
-				LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT),
-				LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT),
-				LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT), pageable);
+		return programmeService.today(channel, pageable);
 	}
 
 	@GetMapping(path = "/{channel}", produces = APPLICATION_JSON_VALUE)
 	public Page<ProgrammeDoc> byNextHour(@PathVariable String channel, Pageable pageable) {
 
-		return programmeRepo.findByChannel(channel, pageable);
+		return programmeService.byChannel(channel, pageable);
 	}
 }
