@@ -11,6 +11,7 @@ import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +40,13 @@ public class ProgrammeController {
 		}
 
 		return programmeRepo.findByDescription(desc, pageable);
+	}
+
+	// Lifetime.HD.uk20240717000000 +000020240717020000 +0000
+	@GetMapping(path = "/id/{id}", produces = APPLICATION_JSON_VALUE)
+	public ResponseEntity<ProgrammeDoc> byId(@PathVariable String id) {
+
+		return ResponseEntity.of(programmeRepo.findById(id));
 	}
 
 	@GetMapping(path = "/{channel}/nextHour", produces = APPLICATION_JSON_VALUE)

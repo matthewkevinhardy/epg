@@ -17,6 +17,7 @@ public class Programme {
 	private List<Category> catagories;
 	private Icon icon;
 	private Rating rating;
+	private List<Credits> credits;
 
 	public String getChannel() {
 		return channel;
@@ -98,4 +99,14 @@ public class Programme {
 	public void setRating(Rating rating) {
 		this.rating = rating;
 	}
+
+	public List<Credits> getCredits() {
+		return credits;
+	}
+
+	@XmlElement(name = "credits")
+	public void setCredits(List<Credits> credits) {
+		this.credits = credits;
+	}
+
 }

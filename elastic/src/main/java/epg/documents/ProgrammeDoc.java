@@ -25,7 +25,7 @@ public class ProgrammeDoc {
 	@Field(name = "stop", type = FieldType.Date, format = DateFormat.date_hour_minute_second, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
 	private LocalDateTime stop;
 
-	@Field(name = "title", type = FieldType.Keyword)
+	@Field(name = "title", type = FieldType.Text)
 	private String title;
 
 	@Field(name = "description", type = FieldType.Text)
@@ -51,6 +51,9 @@ public class ProgrammeDoc {
 
 	@Field(name = "ratingValue", type = FieldType.Keyword)
 	private String ratingValue;
+
+	@Field(name = "credits", type = FieldType.Text)
+	private List<String> credits;
 
 	public String getChannel() {
 		return channel;
@@ -154,6 +157,14 @@ public class ProgrammeDoc {
 
 	public void setProgId(String progId) {
 		this.progId = progId;
+	}
+
+	public List<String> getCredits() {
+		return credits;
+	}
+
+	public void setCredits(List<String> credits) {
+		this.credits = credits;
 	}
 
 }

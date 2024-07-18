@@ -43,6 +43,7 @@ import epg.repos.ChannelRepo;
 import epg.repos.ProgrammeRepo;
 import epg.xml.Category;
 import epg.xml.Channel;
+import epg.xml.Credits;
 import epg.xml.Icon;
 import epg.xml.Programme;
 
@@ -152,6 +153,8 @@ public class BatchFileImport {
 				doc.setStart(LocalDateTime.parse(item.getStart(), dateTimeFormatter));
 				doc.setStop(LocalDateTime.parse(item.getStop(), dateTimeFormatter));
 				doc.setTitle(item.getTitle().getValue());
+				if (item.getCredits() != null)
+					doc.setCredits(item.getCredits().stream().map(Credits::getActor).collect(Collectors.toList()));
 
 				return doc;
 			}
