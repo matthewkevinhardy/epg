@@ -27,6 +27,6 @@
 	<modules>
 		<module>elastic</module>
 		<module>batch</module>
-		<module>service</module>
+		<module>search</module>
 	</modules>
 </project>

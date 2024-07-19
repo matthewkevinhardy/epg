@@ -1,4 +1,4 @@
-package epg.service.controller;
+package epg.search.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import epg.documents.ProgrammeDoc;
-import epg.service.service.ProgrammeService;
+import epg.search.service.ProgrammeService;
 
 @RestController
 @RequestMapping("/v1/programme")

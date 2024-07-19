@@ -1,4 +1,4 @@
-package epg.service.service;
+package epg.search.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
