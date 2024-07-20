@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Go {
+public class GoSearch {
 	public static void main(String[] args) {
-		SpringApplication.run(Go.class, args);
+		SpringApplication.run(GoSearch.class, args);
 	}
 }

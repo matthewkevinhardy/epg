@@ -1,4 +1,4 @@
-package epg;
+package epg.config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -28,9 +29,8 @@ import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
@@ -47,11 +47,9 @@ import epg.xml.Credits;
 import epg.xml.Icon;
 import epg.xml.Programme;
 
-@SpringBootApplication
-public class BatchFileImport {
-
-	private static final org.apache.logging.log4j.Logger LOG = org.apache.logging.log4j.LogManager
-			.getLogger(BatchFileImport.class);
+@Configuration
+public class BatchConfig {
+	private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger(BatchConfig.class);
 
 	@Autowired
 	private ChannelRepo channelRepo;
@@ -70,12 +68,8 @@ public class BatchFileImport {
 
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss Z");
 
-	public static void main(String[] args) {
-		System.exit(SpringApplication.exit(SpringApplication.run(BatchFileImport.class, args)));
-	}
-
 	@Bean
-	public Job importFileJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	public Job importFilesJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		SimpleJobBuilder simpleJobBuilder = new JobBuilder("importFileJob", jobRepository)
 				.start(downloadFilesAndUnzipStep(jobRepository, transactionManager))
 				.next(deleteRepoStep(jobRepository, transactionManager, programmeRepo, "delete prog"))
@@ -323,5 +317,4 @@ public class BatchFileImport {
 			}
 		}, transactionManager).build();
 	}
-
 }
