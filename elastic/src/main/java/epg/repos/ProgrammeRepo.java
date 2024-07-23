@@ -1,6 +1,7 @@
 package epg.repos;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -25,14 +26,14 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 	// @Query(" { \"bool\" : { \"must\" : [ { \"query_string\" : { \"query\" :
 	// \"?0\", \"fields\" : [ \"channel\" ] } }, { \"query_string\" : { \"range\": {
 	// \"start\": { \"gte\": \"?1\", \"lte\": \"?2\" } } } } ] } }")
-	public Page<ProgrammeDoc> findByChannelAndStartBetweenOrStopBetween(String channel, LocalDateTime fromStart,
-			LocalDateTime toStart, LocalDateTime fromStop, LocalDateTime toStop, Pageable pageable);
+	public Page<ProgrammeDoc> findByChannelAndStartBetweenOrStopBetween(String channel, ZonedDateTime fromStart,
+			ZonedDateTime toStart, ZonedDateTime fromStop, ZonedDateTime toStop, Pageable pageable);
 
-	public Optional<ProgrammeDoc> findByChannelAndStartLessThanAndStopGreaterThan(String channel, LocalDateTime toStart,
-			LocalDateTime fromStop);
+	public Optional<ProgrammeDoc> findByChannelAndStartLessThanAndStopGreaterThan(String channel, ZonedDateTime toStart,
+			ZonedDateTime fromStop);
 
-	public Page<ProgrammeDoc> findByChannelAndStopGreaterThanAndStopLessThan(String channel, LocalDateTime toStart,
-			LocalDateTime fromStop, Pageable pageable);
+	public Page<ProgrammeDoc> findByChannelAndStopGreaterThanAndStopLessThan(String channel, ZonedDateTime toStart,
+			ZonedDateTime fromStop, Pageable pageable);
 
 	public Page<ProgrammeDoc> findByChannel(String channel, Pageable pageable);
 
@@ -41,5 +42,5 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 	public Page<ProgrammeDoc> findByDescriptionAndDescriptionLang(String description, String descriptionLang,
 			Pageable pageable);
 
-	public long deleteByStopLessThan(LocalDateTime stop);
+	public long deleteByStopLessThan(ZonedDateTime stop);
 }

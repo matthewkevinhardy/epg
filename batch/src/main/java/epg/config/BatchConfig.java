@@ -5,8 +5,9 @@ import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -148,11 +149,16 @@ public class BatchConfig {
 					doc.setRatingSystem(item.getRating().getSystem());
 					doc.setRatingValue(item.getRating().getValue());
 				}
-				doc.setStart(LocalDateTime.parse(item.getStart(), dateTimeFormatter));
-				doc.setStop(LocalDateTime.parse(item.getStop(), dateTimeFormatter));
+				doc.setStart(ZonedDateTime.parse(item.getStart(), dateTimeFormatter));
+				doc.setStop(ZonedDateTime.parse(item.getStop(), dateTimeFormatter));
 				doc.setTitle(item.getTitle().getValue());
 				if (item.getCredits() != null)
 					doc.setCredits(item.getCredits().stream().map(Credits::getActor).collect(Collectors.toList()));
+
+				// Skip anything before today
+				if (doc.getStop().isBefore(ZonedDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, ZoneOffset.UTC))) {
+					return null;
+				}
 
 				return doc;
 			}
@@ -253,6 +259,15 @@ public class BatchConfig {
 		}, transactionManager).build();
 	}
 
+	/**
+	 * Clear out old programmes
+	 * 
+	 * @param <T>
+	 * @param <ID>
+	 * @param jobRepository
+	 * @param transactionManager
+	 * @return
+	 */
 	private <T, ID> Step deleteOldProgsStep(JobRepository jobRepository,
 			PlatformTransactionManager transactionManager) {
 
@@ -260,7 +275,8 @@ public class BatchConfig {
 
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-				long count = programmeRepo.deleteByStopLessThan(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT));
+				long count = programmeRepo
+						.deleteByStopLessThan(ZonedDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, ZoneOffset.UTC));
 				LOG.info("Deleted old progs: " + count);
 				return RepeatStatus.FINISHED;
 			}

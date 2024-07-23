@@ -3,6 +3,8 @@ package epg.search.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -71,17 +73,17 @@ public class ProgrammeService {
 
 	public Optional<ProgrammeDoc> now(String channel, Pageable pageable) {
 
-		return programmeRepo.findByChannelAndStartLessThanAndStopGreaterThan(channel, LocalDateTime.now(),
-				LocalDateTime.now());
+		return programmeRepo.findByChannelAndStartLessThanAndStopGreaterThan(channel, ZonedDateTime.now(ZoneOffset.UTC),
+				ZonedDateTime.now(ZoneOffset.UTC));
 	}
 
 	public Page<ProgrammeDoc> today(String channel, Pageable pageable) {
 
 		return programmeRepo.findByChannelAndStartBetweenOrStopBetween(channel,
-				LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT),
-				LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT),
-				LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT),
-				LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT), pageable);
+				ZonedDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, ZoneOffset.UTC),
+				ZonedDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, ZoneOffset.UTC),
+				ZonedDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, ZoneOffset.UTC),
+				ZonedDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, ZoneOffset.UTC), pageable);
 	}
 
 	public Page<ProgrammeDoc> byNextHour(@PathVariable String channel, Pageable pageable) {

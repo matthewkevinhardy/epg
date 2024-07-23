@@ -1,6 +1,6 @@
 package epg.documents;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -19,11 +19,11 @@ public class ProgrammeDoc {
 	@Field(name = "channel", type = FieldType.Keyword)
 	private String channel;
 
-	@Field(name = "start", type = FieldType.Date, format = DateFormat.date_hour_minute_second, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-	private LocalDateTime start;
+	@Field(name = "start", type = FieldType.Date, format = DateFormat.date_time_no_millis)
+	private ZonedDateTime start;
 
-	@Field(name = "stop", type = FieldType.Date, format = DateFormat.date_hour_minute_second, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-	private LocalDateTime stop;
+	@Field(name = "stop", type = FieldType.Date, format = DateFormat.date_time_no_millis)
+	private ZonedDateTime stop;
 
 	@Field(name = "title", type = FieldType.Text)
 	private String title;
@@ -63,19 +63,19 @@ public class ProgrammeDoc {
 		this.channel = channel;
 	}
 
-	public LocalDateTime getStart() {
+	public ZonedDateTime getStart() {
 		return start;
 	}
 
-	public void setStart(LocalDateTime start) {
+	public void setStart(ZonedDateTime start) {
 		this.start = start;
 	}
 
-	public LocalDateTime getStop() {
+	public ZonedDateTime getStop() {
 		return stop;
 	}
 
-	public void setStop(LocalDateTime stop) {
+	public void setStop(ZonedDateTime stop) {
 		this.stop = stop;
 	}
 
