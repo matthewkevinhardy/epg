@@ -40,4 +40,6 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 
 	public Page<ProgrammeDoc> findByDescriptionAndDescriptionLang(String description, String descriptionLang,
 			Pageable pageable);
+
+	public long deleteByStopLessThan(LocalDateTime stop);
 }

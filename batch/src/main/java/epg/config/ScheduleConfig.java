@@ -1,4 +1,4 @@
-package epg.service;
+package epg.config;
 
 import java.util.Date;
 
@@ -10,11 +10,14 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
-@Service
-public class BatchScheduleService {
+@Configuration
+@EnableScheduling
+public class ScheduleConfig {
+
 	@Autowired
 	private JobLauncher jobLauncher;
 

@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +14,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -49,7 +52,7 @@ import epg.xml.Programme;
 
 @Configuration
 public class BatchConfig {
-	private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger(BatchConfig.class);
+	private static final Logger LOG = LogManager.getLogger(BatchConfig.class);
 
 	@Autowired
 	private ChannelRepo channelRepo;
@@ -72,8 +75,9 @@ public class BatchConfig {
 	public Job importFilesJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		SimpleJobBuilder simpleJobBuilder = new JobBuilder("importFileJob", jobRepository)
 				.start(downloadFilesAndUnzipStep(jobRepository, transactionManager))
-				.next(deleteRepoStep(jobRepository, transactionManager, programmeRepo, "delete prog"))
-				.next(deleteRepoStep(jobRepository, transactionManager, channelRepo, "delete channel"));
+				// .next(deleteRepoStep(jobRepository, transactionManager, programmeRepo,
+				// "delete prog"))
+				.next(deleteOldProgsStep(jobRepository, transactionManager));
 
 		importFiles.stream().forEach(fileName -> {
 			try {
@@ -244,6 +248,20 @@ public class BatchConfig {
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				repo.deleteAll();
+				return RepeatStatus.FINISHED;
+			}
+		}, transactionManager).build();
+	}
+
+	private <T, ID> Step deleteOldProgsStep(JobRepository jobRepository,
+			PlatformTransactionManager transactionManager) {
+
+		return new StepBuilder("Delete Old Progs", jobRepository).tasklet(new Tasklet() {
+
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				long count = programmeRepo.deleteByStopLessThan(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT));
+				LOG.info("Deleted old progs: " + count);
 				return RepeatStatus.FINISHED;
 			}
 		}, transactionManager).build();

@@ -12,7 +12,7 @@ public class ChannelDoc {
 	@Field(name = "id", type = FieldType.Keyword)
 	private String id;
 
-	@Field(name = "displayName", type = FieldType.Text, analyzer = "case_insensitive")
+	@Field(name = "displayName", type = FieldType.Text)
 	private String displayName;
 
 	@Field(name = "url", type = FieldType.Keyword)

@@ -13,4 +13,5 @@ public interface ChannelRepo extends ElasticsearchRepository<ChannelDoc, String>
 
 	@Query("{\"match\": {\"displayName\": {\"query\":\"?0\", \"fuzziness\": \"3\"} }}")
 	public Page<ChannelDoc> findFuzzyDisplayName(String displayName, Pageable pageable);
+
 }
