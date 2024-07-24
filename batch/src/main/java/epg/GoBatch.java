@@ -28,7 +28,7 @@ public class GoBatch implements CommandLineRunner {
 		Job job = (Job) applicationContext.getBean("importFilesJob");
 
 		JobParameters jobParameters = new JobParametersBuilder()
-				.addString("importFilesJob", String.valueOf(System.currentTimeMillis())).toJobParameters();
+				.addString("Cmd line import files", String.valueOf(System.currentTimeMillis())).toJobParameters();
 
 		var jobExecution = jobLauncher.run(job, jobParameters);
 

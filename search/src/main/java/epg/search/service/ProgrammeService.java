@@ -1,7 +1,6 @@
 package epg.search.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -46,18 +45,15 @@ public class ProgrammeService {
 
 	public ResponseEntity<ProgrammeDoc> byId(String id) {
 
-		// IndexQuery indexQuery = new IndexQueryBuilder().withId(id).build();
-
-		// return ResponseEntity.ofNullable(elasticsearchOperations.get(id,
-		// ProgrammeDoc.class));
-
 		return ResponseEntity.of(programmeRepo.findById(id));
 	}
 
-	public Page<ProgrammeDoc> byChannel(String channel, Pageable pageable) {
+	public Page<ProgrammeDoc> nextHour(String channel, Pageable pageable) {
 
-		Criteria startCriteria = new Criteria("start").between(LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-		Criteria endCriteria = new Criteria("stop").between(LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+		Criteria startCriteria = new Criteria("start").between(ZonedDateTime.now(ZoneOffset.UTC),
+				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1));
+		Criteria endCriteria = new Criteria("stop").between(ZonedDateTime.now(ZoneOffset.UTC),
+				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1));
 		Criteria criteria = new Criteria("channel").is(channel).subCriteria(startCriteria.or(endCriteria));
 
 		Query searchQuery = new CriteriaQuery(criteria);

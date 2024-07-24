@@ -1,14 +1,8 @@
 package epg.search.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.Criteria;
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import epg.documents.ChannelDoc;
@@ -18,16 +12,15 @@ import epg.repos.ChannelRepo;
 public class ChannelService {
 
 	@Autowired
-	private ChannelRepo channelRepos;
+	private ChannelRepo channelRepo;
 
-	@Autowired
-	private ElasticsearchOperations elasticsearchOperations;
+	public Page<ChannelDoc> findByDisplayNameContaining(String displayName, Pageable pageable) {
 
-	public List<ChannelDoc> findByDisplayName(String displayName) {
-		Criteria criteria = new Criteria("displayName").contains(displayName);
-		Query searchQuery = new CriteriaQuery(criteria);
-		SearchHits<ChannelDoc> hits = elasticsearchOperations.search(searchQuery, ChannelDoc.class);
-		List<ChannelDoc> channelList = hits.stream().map(h -> h.getContent()).collect(Collectors.toList());
-		return channelList;
+		return channelRepo.findByDisplayNameContaining(displayName, pageable);
+	}
+
+	public Page<ChannelDoc> findAll(Pageable pageable) {
+
+		return channelRepo.findAll(pageable);
 	}
 }

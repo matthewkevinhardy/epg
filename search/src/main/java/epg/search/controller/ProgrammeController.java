@@ -43,7 +43,7 @@ public class ProgrammeController {
 	@GetMapping(path = "/{channel}/nextHour", produces = APPLICATION_JSON_VALUE)
 	public Page<ProgrammeDoc> byChannel(@PathVariable String channel, Pageable pageable) {
 
-		return programmeService.byChannel(channel, pageable);
+		return programmeService.nextHour(channel, pageable);
 
 	}
 
@@ -57,11 +57,5 @@ public class ProgrammeController {
 	public Page<ProgrammeDoc> today(@PathVariable String channel, Pageable pageable) {
 
 		return programmeService.today(channel, pageable);
-	}
-
-	@GetMapping(path = "/{channel}", produces = APPLICATION_JSON_VALUE)
-	public Page<ProgrammeDoc> byNextHour(@PathVariable String channel, Pageable pageable) {
-
-		return programmeService.byChannel(channel, pageable);
 	}
 }
