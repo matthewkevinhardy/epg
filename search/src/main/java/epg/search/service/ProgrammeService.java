@@ -18,7 +18,6 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -43,9 +42,9 @@ public class ProgrammeService {
 		return programmeRepo.findByDescription(desc, pageable);
 	}
 
-	public ResponseEntity<ProgrammeDoc> byId(String id) {
+	public Optional<ProgrammeDoc> byId(String id) {
 
-		return ResponseEntity.of(programmeRepo.findById(id));
+		return programmeRepo.findById(id);
 	}
 
 	public Page<ProgrammeDoc> nextHour(String channel, Pageable pageable) {
