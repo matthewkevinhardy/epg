@@ -1,9 +1,7 @@
 package epg.config;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
@@ -11,9 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.Job;
@@ -36,7 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileUrlResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -74,20 +69,23 @@ public class BatchConfig {
 
 	@Bean
 	public Job importFilesJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+
 		SimpleJobBuilder simpleJobBuilder = new JobBuilder("importFileJob", jobRepository)
-				.start(downloadFilesAndUnzipStep(jobRepository, transactionManager))
-				// .next(deleteRepoStep(jobRepository, transactionManager, programmeRepo,
-				// "delete prog"))
-				.next(deleteOldProgsStep(jobRepository, transactionManager));
+				.start(deleteOldProgsStep(jobRepository, transactionManager));
 
 		importFiles.stream().forEach(fileName -> {
 			try {
-				FileUrlResource file = new FileUrlResource(importDir + "/" + fileName.replace(".gz", ""));
-				Step importChannelsStep = importStep(jobRepository, transactionManager, channelReader(file),
+				Step downloadFileStep = new StepBuilder("download " + fileName, jobRepository)
+						.tasklet(new DownloadAndUnzipFileTasklet(serverDir, fileName, importDir), transactionManager)
+						.build();
+
+				Step importChannelsStep = importStep(jobRepository, transactionManager, channelReader(fileName),
 						writer(channelRepo), channelProcessor(), "importChannelsStep: " + fileName);
-				Step importProgsStep = importStep(jobRepository, transactionManager, progReader(file),
+
+				Step importProgsStep = importStep(jobRepository, transactionManager, progReader(fileName),
 						writer(programmeRepo), progProcessor(), "importProgsStep: " + fileName);
 
+				simpleJobBuilder.next(downloadFileStep);
 				simpleJobBuilder.next(importChannelsStep);
 				simpleJobBuilder.next(importProgsStep);
 			} catch (MalformedURLException e) {
@@ -129,7 +127,7 @@ public class BatchConfig {
 		return new ItemProcessor<Programme, ProgrammeDoc>() {
 
 			@Override
-			public ProgrammeDoc process(Programme item) throws Exception {
+			public ProgrammeDoc process(Programme item) {
 				ProgrammeDoc doc = new ProgrammeDoc();
 
 				doc.setProgId(item.getChannel() + item.getStart() + item.getStop());
@@ -190,8 +188,11 @@ public class BatchConfig {
 	 * 
 	 * @param inputFile
 	 * @return
+	 * @throws MalformedURLException
 	 */
-	private ItemReader<Channel> channelReader(Resource inputFile) {
+	private ItemReader<Channel> channelReader(String fileName) throws MalformedURLException {
+
+		FileUrlResource inputFile = new FileUrlResource(importDir + "/" + fileName.replace(".gz", ""));
 
 		Jaxb2Marshaller channelMarshaller = new Jaxb2Marshaller();
 		channelMarshaller.setClassesToBeBound(Channel.class);
@@ -206,8 +207,11 @@ public class BatchConfig {
 	 * 
 	 * @param inputFile
 	 * @return
+	 * @throws MalformedURLException
 	 */
-	private ItemReader<Programme> progReader(Resource inputFile) {
+	private ItemReader<Programme> progReader(String fileName) throws MalformedURLException {
+
+		FileUrlResource inputFile = new FileUrlResource(importDir + "/" + fileName.replace(".gz", ""));
 
 		Jaxb2Marshaller channelMarshaller = new Jaxb2Marshaller();
 		channelMarshaller.setClassesToBeBound(Programme.class, Icon.class);
@@ -283,45 +287,42 @@ public class BatchConfig {
 		}, transactionManager).build();
 	}
 
-	/**
-	 * Download file and unzip
-	 * 
-	 * @param <T>
-	 * @param <ID>
-	 * @param jobRepository
-	 * @param transactionManager
-	 * @return
-	 */
-	private <T, ID> Step downloadFilesAndUnzipStep(JobRepository jobRepository,
-			PlatformTransactionManager transactionManager) {
-
-		return new StepBuilder("download file", jobRepository).tasklet(new Tasklet() {
-
-			@Override
-			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-
-				importFiles.stream().forEach(fileName -> {
-
-					try {
-						URL fileUrl = new URL(serverDir + "/" + fileName);
-						File gzFile = new File(importDir + "/" + fileName);
-						File unzipFile = new File(importDir + "/" + fileName.replace(".gz", ""));
-						FileUtils.copyURLToFile(fileUrl, gzFile);
-
-						FileInputStream fis = new FileInputStream(gzFile);
-						GZIPInputStream gis = new GZIPInputStream(fis);
-						FileUtils.copyInputStreamToFile(gis, unzipFile);
-
-						LOG.info("Got file: " + unzipFile.getCanonicalPath());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				});
-
-				return RepeatStatus.FINISHED;
-			}
-		}, transactionManager).build();
-	}
+//	/**
+//	 * Download file and unzip
+//	 * 
+//	 * @param <T>
+//	 * @param <ID>
+//	 * @param jobRepository
+//	 * @param transactionManager
+//	 * @return
+//	 */
+//	private <T, ID> Step downloadFilesAndUnzipStep(JobRepository jobRepository,
+//			PlatformTransactionManager transactionManager) {
+//
+//		return new StepBuilder("download file", jobRepository).tasklet(new Tasklet() {
+//
+//			@Override
+//			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+//
+//				importFiles.stream().forEach(fileName -> {
+//
+//					URL fileUrl = new URL(serverDir + "/" + fileName);
+//					File gzFile = new File(importDir + "/" + fileName);
+//					File unzipFile = new File(importDir + "/" + fileName.replace(".gz", ""));
+//					FileUtils.copyURLToFile(fileUrl, gzFile);
+//
+//					FileInputStream fis = new FileInputStream(gzFile);
+//					GZIPInputStream gis = new GZIPInputStream(fis);
+//					FileUtils.copyInputStreamToFile(gis, unzipFile);
+//
+//					LOG.info("Got file: " + unzipFile.getCanonicalPath());
+//
+//				});
+//
+//				return RepeatStatus.FINISHED;
+//			}
+//		}, transactionManager).build();
+//	}
 
 	/**
 	 * Delete the files
