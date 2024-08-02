@@ -4,20 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.Criteria;
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -49,27 +42,38 @@ public class ProgrammeService {
 
 	public Page<ProgrammeDoc> nextHour(String channel, Pageable pageable) {
 
-		Criteria startCriteria = new Criteria("start").between(ZonedDateTime.now(ZoneOffset.UTC),
-				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1));
-		Criteria endCriteria = new Criteria("stop").between(ZonedDateTime.now(ZoneOffset.UTC),
-				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1));
-		Criteria criteria = new Criteria("channel").is(channel).subCriteria(startCriteria.or(endCriteria));
+//		Criteria startCriteria = new Criteria("start").between(ZonedDateTime.now(ZoneOffset.UTC),
+//				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1));
+//
+//		Criteria endCriteria = new Criteria("stop").between(ZonedDateTime.now(ZoneOffset.UTC),
+//				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1));
+//
+//		Criteria inbetweenCrtieria = new Criteria("start").lessThan(ZonedDateTime.now(ZoneOffset.UTC)).and("stop")
+//				.greaterThan(ZonedDateTime.now(ZoneOffset.UTC));
+//
+//		Criteria criteria = new Criteria("channel").is(channel)
+//				.subCriteria(startCriteria.or(endCriteria).or(inbetweenCrtieria));
+//
+//		Query searchQuery = new CriteriaQuery(criteria);
+//		searchQuery.setPageable(pageable);
+//		SearchHits<ProgrammeDoc> hits = elasticsearchOperations.search(searchQuery, ProgrammeDoc.class);
+//
+//		List<ProgrammeDoc> progDocList = hits.stream().map(h -> h.getContent()).collect(Collectors.toList());
+//		Page<ProgrammeDoc> page = new PageImpl<>(progDocList, pageable, hits.getTotalHits());
 
-		Query searchQuery = new CriteriaQuery(criteria);
-		searchQuery.setPageable(pageable);
-		SearchHits<ProgrammeDoc> hits = elasticsearchOperations.search(searchQuery, ProgrammeDoc.class);
+		return programmeRepo.findInTimeSlot(channel, ZonedDateTime.now(ZoneOffset.UTC).withNano(0),
+				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).withNano(0), pageable);
 
-		List<ProgrammeDoc> progDocList = hits.stream().map(h -> h.getContent()).collect(Collectors.toList());
-		Page<ProgrammeDoc> page = new PageImpl<>(progDocList, pageable, hits.getTotalHits());
-
-		return page;
+		// return page;
 
 	}
 
-	public Optional<ProgrammeDoc> now(String channel, Pageable pageable) {
+	public Page<ProgrammeDoc> now(String channel, Pageable pageable) {
 
-		return programmeRepo.findByChannelAndStartLessThanAndStopGreaterThan(channel, ZonedDateTime.now(ZoneOffset.UTC),
-				ZonedDateTime.now(ZoneOffset.UTC));
+//		return programmeRepo.findByChannelAndStartLessThanAndStopGreaterThan(channel, ZonedDateTime.now(ZoneOffset.UTC),
+//				ZonedDateTime.now(ZoneOffset.UTC));
+
+		return programmeRepo.findNow(channel, pageable);
 	}
 
 	public Page<ProgrammeDoc> today(String channel, Pageable pageable) {

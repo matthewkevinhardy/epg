@@ -46,9 +46,9 @@ public class ProgrammeController {
 	}
 
 	@GetMapping(path = "/{channel}/now", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<ProgrammeDoc> now(@PathVariable String channel, Pageable pageable) {
+	public ResponseEntity<Page<ProgrammeDoc>> now(@PathVariable String channel, Pageable pageable) {
 
-		return ResponseEntity.of(programmeService.now(channel, pageable));
+		return ResponseEntity.ok(programmeService.now(channel, pageable));
 	}
 
 	@GetMapping(path = "/{channel}/today", produces = APPLICATION_JSON_VALUE)

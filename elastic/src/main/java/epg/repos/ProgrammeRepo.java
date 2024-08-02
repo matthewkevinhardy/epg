@@ -19,13 +19,12 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 	@Query(" { \"range\": { \"start\": { \"gte\": \"?0\", \"lte\": \"?1\" } } } ")
 	public Page<ProgrammeDoc> findByStart(LocalDateTime begin, LocalDateTime end, Pageable pageable);
 
-	// { "query" : { "bool" : { "must" : [ { "query_string" : { "query" : "?0",
-	// "fields" : [ "channel" ] } }, { "query_string" : { "range": { "start": {
-	// "gte": "?1", "lte": "?2" } } } } ] } }}
+	@Query("{\"bool\":{\"must\":[{\"query_string\":{\"default_operator\":\"and\",\"fields\":[\"channel\"],\"query\":\"?0\"}},{\"bool\":{\"should\":[{\"range\":{\"start\":{\"gte\":\"?1\",\"lte\":\"?2\"}}},{\"range\":{\"stop\":{\"gte\":\"?1\",\"lte\":\"?2\"}}},  {\"bool\": {\"must\": [{ \"range\": { \"start\": { \"lt\": \"now\" } } },{ \"range\": { \"stop\": { \"gt\": \"now\" } } }]}}  ]}}]}}")
+	public Page<ProgrammeDoc> findInTimeSlot(String channel, ZonedDateTime begin, ZonedDateTime end, Pageable pageable);
 
-	// @Query(" { \"bool\" : { \"must\" : [ { \"query_string\" : { \"query\" :
-	// \"?0\", \"fields\" : [ \"channel\" ] } }, { \"query_string\" : { \"range\": {
-	// \"start\": { \"gte\": \"?1\", \"lte\": \"?2\" } } } } ] } }")
+	@Query("{\"bool\":{\"must\":[{\"query_string\":{\"default_operator\":\"and\",\"fields\":[\"channel\"],\"query\":\"?0\"}},{\"range\":{\"start\":{\"lte\":\"now\"}}},{\"range\":{\"stop\":{\"gte\":\"now\"}}}]}}")
+	public Page<ProgrammeDoc> findNow(String channel, Pageable pageable);
+
 	public Page<ProgrammeDoc> findByChannelAndStartBetweenOrStopBetween(String channel, ZonedDateTime fromStart,
 			ZonedDateTime toStart, ZonedDateTime fromStop, ZonedDateTime toStop, Pageable pageable);
 
