@@ -19,4 +19,4 @@ Data from ElasticSearch made available via a webservice hosted within Spring Boo
 
 ### Programme endpoints
 - [https://mkhardy.uk.to/epg/v1/programme/BBC.One.Lon.HD.uk/now](https://mkhardy.uk.to/epg/v1/programme/BBC.One.Lon.HD.uk/now)
-- [https://mkhardy.uk.to/epg/v1/programme/BBC.One.Lon.HD.uk/now](https://mkhardy.uk.to/epg/v1/programme/BBC.One.Lon.HD.uk/now)
+- [https://mkhardy.uk.to/epg/v1/programme/ITV1.HD.uk/nextHour](https://mkhardy.uk.to/epg/v1/programme/ITV1.HD.uk/nextHour)
