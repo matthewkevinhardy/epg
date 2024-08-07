@@ -36,6 +36,12 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Conflicts;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
+import co.elastic.clients.json.JsonData;
 import epg.documents.ChannelDoc;
 import epg.documents.ProgrammeDoc;
 import epg.repos.ChannelRepo;
@@ -64,6 +70,9 @@ public class BatchConfig {
 
 	@Value("${epg.batch.server.dir}")
 	private String serverDir;
+
+	@Autowired
+	private ElasticsearchClient elasticsearchClient;
 
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss Z");
 
@@ -279,50 +288,17 @@ public class BatchConfig {
 
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-				long count = programmeRepo
-						.deleteByStopLessThan(ZonedDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, ZoneOffset.UTC));
-				LOG.info("Deleted old progs: " + count);
+				DeleteByQueryRequest dbyquery = DeleteByQueryRequest.of(fn -> fn.conflicts(Conflicts.Proceed)
+						.query(RangeQuery.of(rq -> rq.field("stop").lt(JsonData.of("now/d")))._toQuery())
+						.index("programme"));
+
+				DeleteByQueryResponse dqr = elasticsearchClient.deleteByQuery(dbyquery);
+
+				LOG.info("Deleted old progs: " + dqr.deleted());
 				return RepeatStatus.FINISHED;
 			}
 		}, transactionManager).build();
 	}
-
-//	/**
-//	 * Download file and unzip
-//	 * 
-//	 * @param <T>
-//	 * @param <ID>
-//	 * @param jobRepository
-//	 * @param transactionManager
-//	 * @return
-//	 */
-//	private <T, ID> Step downloadFilesAndUnzipStep(JobRepository jobRepository,
-//			PlatformTransactionManager transactionManager) {
-//
-//		return new StepBuilder("download file", jobRepository).tasklet(new Tasklet() {
-//
-//			@Override
-//			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-//
-//				importFiles.stream().forEach(fileName -> {
-//
-//					URL fileUrl = new URL(serverDir + "/" + fileName);
-//					File gzFile = new File(importDir + "/" + fileName);
-//					File unzipFile = new File(importDir + "/" + fileName.replace(".gz", ""));
-//					FileUtils.copyURLToFile(fileUrl, gzFile);
-//
-//					FileInputStream fis = new FileInputStream(gzFile);
-//					GZIPInputStream gis = new GZIPInputStream(fis);
-//					FileUtils.copyInputStreamToFile(gis, unzipFile);
-//
-//					LOG.info("Got file: " + unzipFile.getCanonicalPath());
-//
-//				});
-//
-//				return RepeatStatus.FINISHED;
-//			}
-//		}, transactionManager).build();
-//	}
 
 	/**
 	 * Delete the files
