@@ -1,4 +1,4 @@
-package epg.xml;
+package epg.batch.config.xml;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;

@@ -1,4 +1,4 @@
-package epg.config;
+package epg.batch.config;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -42,15 +42,16 @@ import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import co.elastic.clients.json.JsonData;
+import epg.batch.config.tasklet.DownloadAndUnzipFileTasklet;
+import epg.batch.config.xml.Category;
+import epg.batch.config.xml.Channel;
+import epg.batch.config.xml.Credits;
+import epg.batch.config.xml.Icon;
+import epg.batch.config.xml.Programme;
 import epg.documents.ChannelDoc;
 import epg.documents.ProgrammeDoc;
 import epg.repos.ChannelRepo;
 import epg.repos.ProgrammeRepo;
-import epg.xml.Category;
-import epg.xml.Channel;
-import epg.xml.Credits;
-import epg.xml.Icon;
-import epg.xml.Programme;
 
 @Configuration
 public class BatchConfig {

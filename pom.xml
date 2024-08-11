@@ -28,5 +28,6 @@
 		<module>elastic</module>
 		<module>batch</module>
 		<module>search</module>
+		<module>batch-config</module>
 	</modules>
 </project>

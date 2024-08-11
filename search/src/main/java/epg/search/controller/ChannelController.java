@@ -2,6 +2,8 @@ package epg.search.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +22,7 @@ import epg.search.service.ChannelService;
 @RequestMapping("/v1/channel")
 public class ChannelController {
 
-	private static final org.apache.logging.log4j.Logger LOG = org.apache.logging.log4j.LogManager
-			.getLogger(ChannelController.class);
+	private static final Logger LOG = LogManager.getLogger(ChannelController.class);
 
 	@Autowired
 	private ChannelService channelService;

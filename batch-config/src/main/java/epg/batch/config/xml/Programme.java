@@ -1,4 +1,4 @@
-package epg.xml;
+package epg.batch.config.xml;
 
 import java.util.List;
 
