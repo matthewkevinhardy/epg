@@ -24,8 +24,8 @@ public class ScheduleConfig {
 	@Autowired
 	private Job importFilesJob;
 
-	@Scheduled(cron = "0 0 0 * * *")
-	public void runAtMidnight() throws JobParametersInvalidException, JobExecutionAlreadyRunningException,
+	@Scheduled(cron = "${epg.search.importFilesCron}")
+	public void runImportFilesJob() throws JobParametersInvalidException, JobExecutionAlreadyRunningException,
 			JobRestartException, JobInstanceAlreadyCompleteException {
 		jobLauncher.run(importFilesJob, new JobParametersBuilder().addDate("timestamp", new Date()).toJobParameters());
 	}
