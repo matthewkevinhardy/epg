@@ -2,6 +2,8 @@ package epg.search.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,9 +48,15 @@ public class ProgrammeController {
 	}
 
 	@GetMapping(path = "/{channel}/now", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProgrammeDoc>> now(@PathVariable String channel, Pageable pageable) {
+	public ResponseEntity<ProgrammeDoc> now(@PathVariable String channel, Pageable pageable) {
 
-		return ResponseEntity.ok(programmeService.now(channel, pageable));
+		return ResponseEntity.ok(programmeService.now(channel));
+	}
+
+	@GetMapping(path = "/{channel}/nowAndNext", produces = APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<ProgrammeDoc>> nowAndNext(@PathVariable String channel) {
+
+		return ResponseEntity.ok(programmeService.nowAndNext(channel));
 	}
 
 	@GetMapping(path = "/{channel}/today", produces = APPLICATION_JSON_VALUE)

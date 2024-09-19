@@ -2,6 +2,8 @@ package epg.search.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +30,10 @@ public class ChannelController {
 	private ChannelService channelService;
 
 	@GetMapping(path = "/{channelSearch}", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ChannelDoc>> byChannel(@PathVariable String channelSearch,
+	public ResponseEntity<Page<ChannelDoc>> byChannel(@PathVariable String term,
 			@PageableDefault(sort = { "id" }, direction = Direction.ASC) final Pageable pageable) {
 
-		return ResponseEntity.ok(channelService.findByDisplayNameContaining(channelSearch, pageable));
+		return ResponseEntity.ok(channelService.findByDisplayNameContaining(List.of(term), pageable));
 	}
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)

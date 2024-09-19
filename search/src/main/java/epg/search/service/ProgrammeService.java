@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.http.util.TextUtils;
@@ -42,9 +43,16 @@ public class ProgrammeService {
 
 	}
 
-	public Page<ProgrammeDoc> now(String channel, Pageable pageable) {
+	public ProgrammeDoc now(String channel) {
 
-		return programmeRepo.findNow(channel, pageable);
+		return programmeRepo.findNow(channel);
+	}
+
+	public List<ProgrammeDoc> nowAndNext(String channel) {
+
+		ProgrammeDoc now = programmeRepo.findNow(channel);
+		ProgrammeDoc next = programmeRepo.findByChannelAndStart(channel, now.getStop());
+		return List.of(now, next);
 	}
 
 	public Page<ProgrammeDoc> today(String channel, Pageable pageable) {
