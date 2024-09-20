@@ -14,9 +14,9 @@ public class ChannelService {
 	@Autowired
 	private ChannelRepo channelRepo;
 
-	public Page<ChannelDoc> findByDisplayNameContaining(String term, Pageable pageable) {
+	public Page<ChannelDoc> findByDisplayNameContaining(String searchTerm, Pageable pageable) {
 
-		return channelRepo.findByDisplayNameContaining(term, pageable);
+		return channelRepo.findByDisplayNameContaining(searchTerm, pageable);
 	}
 
 	public Page<ChannelDoc> findAll(Pageable pageable) {

@@ -27,11 +27,11 @@ public class ChannelController {
 	@Autowired
 	private ChannelService channelService;
 
-	@GetMapping(path = "/{channelSearch}", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ChannelDoc>> byChannel(@PathVariable String term,
+	@GetMapping(path = "/{searchTerm}", produces = APPLICATION_JSON_VALUE)
+	public ResponseEntity<Page<ChannelDoc>> byChannel(@PathVariable String searchTerm,
 			@PageableDefault(sort = { "id" }, direction = Direction.ASC) final Pageable pageable) {
 
-		return ResponseEntity.ok(channelService.findByDisplayNameContaining(term, pageable));
+		return ResponseEntity.ok(channelService.findByDisplayNameContaining(searchTerm, pageable));
 	}
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
