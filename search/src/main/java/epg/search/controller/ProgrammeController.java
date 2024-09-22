@@ -28,7 +28,8 @@ public class ProgrammeController {
 
 	@GetMapping(path = "/description/{desc}", produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<Page<ProgrammeDoc>> byDescription(@PathVariable String desc,
-			@RequestParam(required = false) String lang, Pageable pageable) {
+			@RequestParam(required = false) String lang,
+			@PageableDefault(sort = { "start" }, direction = Direction.ASC) Pageable pageable) {
 
 		return ResponseEntity.ok(programmeService.byDescription(desc, lang, pageable));
 	}

@@ -26,10 +26,10 @@ public class ProgrammeService {
 	public Page<ProgrammeDoc> byDescription(String desc, String lang, Pageable pageable) {
 
 		if (!TextUtils.isBlank(lang)) {
-			return programmeRepo.findByDescriptionAndDescriptionLang(desc, lang, pageable);
+			return programmeRepo.findByDescriptionContainingAndDescriptionLang(desc, lang, pageable);
 		}
 
-		return programmeRepo.findByDescription(desc, pageable);
+		return programmeRepo.findByDescriptionContaining(desc, pageable);
 	}
 
 	public Optional<ProgrammeDoc> byId(String id) {
