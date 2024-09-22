@@ -23,9 +23,9 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 	public Page<ProgrammeDoc> findInTimeSlot(String channel, ZonedDateTime begin, ZonedDateTime end, Pageable pageable);
 
 	@Query("{\"bool\":{\"must\":[{\"query_string\":{\"default_operator\":\"and\",\"fields\":[\"channel\"],\"query\":\"?0\"}},{\"range\":{\"start\":{\"lte\":\"now\"}}},{\"range\":{\"stop\":{\"gte\":\"now\"}}}]}}")
-	public ProgrammeDoc findNow(String channel);
+	public Optional<ProgrammeDoc> findNow(String channel);
 
-	public ProgrammeDoc findByChannelAndStart(String channel, ZonedDateTime start);
+	public Optional<ProgrammeDoc> findByChannelAndStart(String channel, ZonedDateTime start);
 
 	public Page<ProgrammeDoc> findByChannelAndStartBetweenOrStopBetween(String channel, ZonedDateTime fromStart,
 			ZonedDateTime toStart, ZonedDateTime fromStop, ZonedDateTime toStop, Pageable pageable);

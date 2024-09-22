@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,16 +44,23 @@ public class ProgrammeService {
 
 	}
 
-	public ProgrammeDoc now(String channel) {
+	public Optional<ProgrammeDoc> now(String channel) {
 
 		return programmeRepo.findNow(channel);
 	}
 
 	public List<ProgrammeDoc> nowAndNext(String channel) {
 
-		ProgrammeDoc now = programmeRepo.findNow(channel);
-		ProgrammeDoc next = programmeRepo.findByChannelAndStart(channel, now.getStop());
-		return List.of(now, next);
+		List<ProgrammeDoc> nowNextList = new LinkedList<>();
+
+		programmeRepo.findNow(channel).ifPresent(nowDoc -> {
+			nowNextList.add(nowDoc);
+			programmeRepo.findByChannelAndStart(channel, nowDoc.getStop()).ifPresent(nextDoc -> {
+				nowNextList.add(nextDoc);
+			});
+		});
+
+		return nowNextList;
 	}
 
 	public Page<ProgrammeDoc> today(String channel, Pageable pageable) {
