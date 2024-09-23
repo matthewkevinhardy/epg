@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.http.util.TextUtils;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import epg.documents.ProgrammeDoc;
 import epg.repos.ProgrammeRepo;
+import epg.search.cache.ProgDocList;
 
 @Service
 public class ProgrammeService {
@@ -51,9 +50,10 @@ public class ProgrammeService {
 		return programmeRepo.findNow(channel);
 	}
 
-	public List<ProgrammeDoc> nowAndNext(String channel) {
+	@Cacheable(value = "nowAndNextCache")
+	public ProgDocList nowAndNext(String channel) {
 
-		List<ProgrammeDoc> nowNextList = new LinkedList<>();
+		ProgDocList nowNextList = new ProgDocList();
 
 		programmeRepo.findNow(channel).ifPresent(nowDoc -> {
 			nowNextList.add(nowDoc);

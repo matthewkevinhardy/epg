@@ -23,13 +23,25 @@ public class CacheConfig {
 		CachingProvider provider = Caching.getCachingProvider();
 		CacheManager cacheManager = provider.getCacheManager();
 
-		CacheConfigurationBuilder<String, ProgrammeDoc> nowConfiguration = CacheConfigurationBuilder
+		cacheManager.createCache("nowCache", Eh107Configuration.fromEhcacheCacheConfiguration(getNowConfig()));
+		cacheManager.createCache("nowAndNextCache",
+				Eh107Configuration.fromEhcacheCacheConfiguration(getNowAndNextConfig()));
+
+		return cacheManager;
+
+	}
+
+	private CacheConfigurationBuilder<String, ProgrammeDoc> getNowConfig() {
+		return CacheConfigurationBuilder
 				.newCacheConfigurationBuilder(String.class, ProgrammeDoc.class,
 						ResourcePoolsBuilder.newResourcePoolsBuilder().heap(100, EntryUnit.ENTRIES))
 				.withExpiry(new NowExpiryPolicy());
+	}
 
-		cacheManager.createCache("nowCache", Eh107Configuration.fromEhcacheCacheConfiguration(nowConfiguration));
-		return cacheManager;
-
+	private CacheConfigurationBuilder<String, ProgDocList> getNowAndNextConfig() {
+		return CacheConfigurationBuilder
+				.newCacheConfigurationBuilder(String.class, ProgDocList.class,
+						ResourcePoolsBuilder.newResourcePoolsBuilder().heap(100, EntryUnit.ENTRIES))
+				.withExpiry(new NowAndNextExpiryPolicy());
 	}
 }
