@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ public class ProgrammeService {
 
 	}
 
+	@Cacheable(value = "nowCache")
 	public Optional<ProgrammeDoc> now(String channel) {
 
 		return programmeRepo.findNow(channel);
