@@ -34,33 +34,27 @@ public class ProgrammeController {
 		return ResponseEntity.ok(programmeService.byDescription(desc, lang, pageable));
 	}
 
-	@GetMapping(path = "/id/{id}", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<ProgrammeDoc> byId(@PathVariable String id) {
-
-		return ResponseEntity.of(programmeService.byId(id));
-	}
-
-	@GetMapping(path = "/{channel}/nextHour", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProgrammeDoc>> byChannel(@PathVariable String channel,
+	@GetMapping(path = "/nextHour", produces = APPLICATION_JSON_VALUE)
+	public ResponseEntity<Page<ProgrammeDoc>> byChannel(@RequestParam(required = true) String channel,
 			@PageableDefault(sort = { "start" }, direction = Direction.ASC) final Pageable pageable) {
 
 		return ResponseEntity.ok(programmeService.nextHour(channel, pageable));
 
 	}
 
-	@GetMapping(path = "/{channel}/now", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<ProgrammeDoc> now(@PathVariable String channel, Pageable pageable) {
+	@GetMapping(path = "/now", produces = APPLICATION_JSON_VALUE)
+	public ResponseEntity<ProgrammeDoc> now(@RequestParam(required = true) String channel, Pageable pageable) {
 		return ResponseEntity.of(programmeService.now(channel));
 	}
 
-	@GetMapping(path = "/{channel}/nowAndNext", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ProgrammeDoc>> nowAndNext(@PathVariable String channel) {
+	@GetMapping(path = "/nowAndNext", produces = APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<ProgrammeDoc>> nowAndNext(@RequestParam(required = true) String channel) {
 
 		return ResponseEntity.ok(programmeService.nowAndNext(channel));
 	}
 
-	@GetMapping(path = "/{channel}/today", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProgrammeDoc>> today(@PathVariable String channel,
+	@GetMapping(path = "/today", produces = APPLICATION_JSON_VALUE)
+	public ResponseEntity<Page<ProgrammeDoc>> today(@RequestParam(required = true) String channel,
 			@PageableDefault(sort = { "start" }, direction = Direction.ASC) final Pageable pageable) {
 
 		return ResponseEntity.ok(programmeService.today(channel, pageable));

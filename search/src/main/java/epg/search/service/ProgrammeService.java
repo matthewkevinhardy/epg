@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import epg.documents.ProgrammeDoc;
 import epg.repos.ProgrammeRepo;
 import epg.search.cache.ProgDocList;
+import epg.search.utils.QueryUtils;
 
 @Service
 public class ProgrammeService {
@@ -32,14 +33,9 @@ public class ProgrammeService {
 		return programmeRepo.findByDescriptionContaining(desc, pageable);
 	}
 
-	public Optional<ProgrammeDoc> byId(String id) {
-
-		return programmeRepo.findById(id);
-	}
-
 	public Page<ProgrammeDoc> nextHour(String channel, Pageable pageable) {
 
-		return programmeRepo.findInTimeSlot(channel, ZonedDateTime.now(ZoneOffset.UTC).withNano(0),
+		return programmeRepo.findInTimeSlot(QueryUtils.escape(channel), ZonedDateTime.now(ZoneOffset.UTC).withNano(0),
 				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).withNano(0), pageable);
 
 	}
@@ -47,7 +43,7 @@ public class ProgrammeService {
 	@Cacheable(value = "nowCache")
 	public Optional<ProgrammeDoc> now(String channel) {
 
-		return programmeRepo.findNow(channel);
+		return programmeRepo.findNow(QueryUtils.escape(channel));
 	}
 
 	@Cacheable(value = "nowAndNextCache")
@@ -55,9 +51,9 @@ public class ProgrammeService {
 
 		ProgDocList nowNextList = new ProgDocList();
 
-		programmeRepo.findNow(channel).ifPresent(nowDoc -> {
+		programmeRepo.findNow(QueryUtils.escape(channel)).ifPresent(nowDoc -> {
 			nowNextList.add(nowDoc);
-			programmeRepo.findByChannelAndStart(channel, nowDoc.getStop()).ifPresent(nextDoc -> {
+			programmeRepo.findByChannelAndStart(QueryUtils.escape(channel), nowDoc.getStop()).ifPresent(nextDoc -> {
 				nowNextList.add(nextDoc);
 			});
 		});
@@ -67,7 +63,7 @@ public class ProgrammeService {
 
 	public Page<ProgrammeDoc> today(String channel, Pageable pageable) {
 
-		return programmeRepo.findInTimeSlot(channel,
+		return programmeRepo.findInTimeSlot(QueryUtils.escape(channel),
 				ZonedDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, ZoneOffset.UTC),
 				ZonedDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, ZoneOffset.UTC), pageable);
 	}

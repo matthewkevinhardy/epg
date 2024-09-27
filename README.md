@@ -18,6 +18,6 @@ Data from ElasticSearch made available via a webservice hosted within Spring Boo
 - [https://mkhardy.uk.to/epg/v1/channel/bbc](https://mkhardy.uk.to/epg/v1/channel/bbc)
 
 ### Programme endpoints
-- [https://mkhardy.uk.to/epg/v1/programme/BBC.One.Lon.HD.uk/now](https://mkhardy.uk.to/epg/v1/programme/BBC.One.Lon.HD.uk/now)
-- [https://mkhardy.uk.to/epg/v1/programme/ITV1.HD.uk/nextHour](https://mkhardy.uk.to/epg/v1/programme/ITV1.HD.uk/nextHour)
-- [https://mkhardy.uk.to/epg/v1/programme/Channel.5.HD.uk/nowAndNext](https://mkhardy.uk.to/epg/v1/programme/Channel.5.HD.uk/nowAndNext)
+- [https://mkhardy.uk.to/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk](https://mkhardy.uk.to/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk)
+- [https://mkhardy.uk.to/epg/v1/programme/nextHour?channerl=ITV1.HD.uk](https://mkhardy.uk.to/epg/v1/programme/nextHour?channerl=ITV1.HD.uk)
+- [https://mkhardy.uk.to/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk](https://mkhardy.uk.to/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk)
