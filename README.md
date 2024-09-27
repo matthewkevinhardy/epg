@@ -19,5 +19,5 @@ Data from ElasticSearch made available via a webservice hosted within Spring Boo
 
 ### Programme endpoints
 - [https://mkhardy.uk.to/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk](https://mkhardy.uk.to/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk)
-- [https://mkhardy.uk.to/epg/v1/programme/nextHour?channerl=ITV1.HD.uk](https://mkhardy.uk.to/epg/v1/programme/nextHour?channerl=ITV1.HD.uk)
+- [https://mkhardy.uk.to/epg/v1/programme/nextHour?channel=ITV1.HD.uk](https://mkhardy.uk.to/epg/v1/programme/nextHour?channel=ITV1.HD.uk)
 - [https://mkhardy.uk.to/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk](https://mkhardy.uk.to/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk)
