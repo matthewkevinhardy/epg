@@ -14,10 +14,10 @@ Data from ElasticSearch made available via a webservice hosted within Spring Boo
 `java -jar search/target/search-0.0.1-SNAPSHOT.jar`
 
 ### Channel endpoints
-- [https://mkhardy.uk.to/epg/v1/channel](https://mkhardy.uk.to/epg/v1/channel)
-- [https://mkhardy.uk.to/epg/v1/channel/bbc](https://mkhardy.uk.to/epg/v1/channel/bbc)
+- [https://mkhardy.co.uk/epg/v1/channel](https://mkhardy.co.uk/epg/v1/channel)
+- [https://mkhardy.co.uk/epg/v1/channel/bbc](https://mkhardy.co.uk/epg/v1/channel/bbc)
 
 ### Programme endpoints
-- [https://mkhardy.uk.to/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk](https://mkhardy.uk.to/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk)
-- [https://mkhardy.uk.to/epg/v1/programme/nextHour?channel=ITV1.HD.uk](https://mkhardy.uk.to/epg/v1/programme/nextHour?channel=ITV1.HD.uk)
-- [https://mkhardy.uk.to/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk](https://mkhardy.uk.to/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk)
+- [https://mkhardy.co.uk/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk](https://mkhardy.co.uk/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk)
+- [https://mkhardy.co.uk/epg/v1/programme/nextHour?channel=ITV1.HD.uk](https://mkhardy.co.uk/epg/v1/programme/nextHour?channel=ITV1.HD.uk)
+- [https://mkhardy.co.uk/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk](https://mkhardy.co.uk/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk)
