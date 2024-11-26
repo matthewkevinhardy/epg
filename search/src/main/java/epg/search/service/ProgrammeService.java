@@ -40,13 +40,13 @@ public class ProgrammeService {
 
 	}
 
-	@Cacheable(value = "nowCache")
+	@Cacheable(value = "nowCache", unless = "#result==null")
 	public Optional<ProgrammeDoc> now(String channel) {
 
 		return programmeRepo.findNow(QueryUtils.escape(channel));
 	}
 
-	@Cacheable(value = "nowAndNextCache")
+	@Cacheable(value = "nowAndNextCache", unless = "#result.isEmpty")
 	public ProgDocList nowAndNext(String channel) {
 
 		ProgDocList nowNextList = new ProgDocList();
