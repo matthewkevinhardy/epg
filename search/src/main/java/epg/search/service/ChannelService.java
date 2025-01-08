@@ -16,7 +16,7 @@ public class ChannelService {
 
 	public Page<ChannelDoc> findByDisplayNameContaining(String searchTerm, Pageable pageable) {
 
-		return channelRepo.findByDisplayNameContaining(searchTerm, pageable);
+		return channelRepo.findByDisplayNameContainingOrIdContaining(searchTerm, searchTerm, pageable);
 	}
 
 	public Page<ChannelDoc> findAll(Pageable pageable) {

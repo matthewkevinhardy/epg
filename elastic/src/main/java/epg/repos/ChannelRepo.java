@@ -8,5 +8,6 @@ import epg.documents.ChannelDoc;
 
 public interface ChannelRepo extends ElasticsearchRepository<ChannelDoc, String> {
 
-	public Page<ChannelDoc> findByDisplayNameContaining(String searchTerm, Pageable pageable);
+	public Page<ChannelDoc> findByDisplayNameContainingOrIdContaining(String searchTermName, String searchTermId,
+			Pageable pageable);
 }
