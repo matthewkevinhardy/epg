@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.http.util.TextUtils;
@@ -43,19 +44,29 @@ public class ProgrammeService {
 	@Cacheable(value = "nowCache", unless = "#result==null")
 	public Optional<ProgrammeDoc> now(String channel) {
 
-		return programmeRepo.findNow(QueryUtils.escape(channel));
+		return programmeRepo.findNow(List.of(QueryUtils.escape(channel)), Pageable.unpaged()).get().findFirst();
 	}
+
+	public Page<ProgrammeDoc> now(List<String> channels, Pageable pageable) {
+
+		return programmeRepo.findNow(channels, pageable);
+	}
+
+//	@Cacheable(value = "nowCache", unless = "#result==null")
+//	public Optional<ProgrammeDoc> now(List<String> channel) {
+//
+//		return programmeRepo.findNow(QueryUtils.escape(channel));
+//	}
 
 	@Cacheable(value = "nowAndNextCache", unless = "#result.isEmpty")
 	public ProgDocList nowAndNext(String channel) {
 
 		ProgDocList nowNextList = new ProgDocList();
 
-		programmeRepo.findNow(QueryUtils.escape(channel)).ifPresent(nowDoc -> {
+		now(QueryUtils.escape(channel)).ifPresent(nowDoc -> {
 			nowNextList.add(nowDoc);
-			programmeRepo.findByChannelAndStart(QueryUtils.escape(channel), nowDoc.getStop()).ifPresent(nextDoc -> {
-				nowNextList.add(nextDoc);
-			});
+			programmeRepo.findByChannelAndStart(List.of(QueryUtils.escape(channel)), nowDoc.getStop())
+					.ifPresent(nowNextList::add);
 		});
 
 		return nowNextList;

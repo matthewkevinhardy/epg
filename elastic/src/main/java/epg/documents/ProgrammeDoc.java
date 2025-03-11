@@ -1,7 +1,9 @@
 package epg.documents;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
@@ -167,4 +169,46 @@ public class ProgrammeDoc {
 		this.credits = credits;
 	}
 
+	public static class ProgrammeBuilder {
+		private ProgrammeDoc programmeDoc;
+
+		public ProgrammeBuilder() {
+			programmeDoc = new ProgrammeDoc();
+			programmeDoc.setStart(ZonedDateTime.now(ZoneOffset.UTC).withSecond(0).withNano(0));
+			programmeDoc.setStop(ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(30).withSecond(0).withNano(0));
+			programmeDoc.setChannel("channel");
+			programmeDoc.setProgId(new Random().nextLong() + "");
+			programmeDoc.setDescription(programmeDoc.getProgId());
+		}
+
+		public ProgrammeBuilder withStartPlus(int minutes) {
+			programmeDoc.setStart(ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(minutes).withSecond(0).withNano(0));
+			return this;
+		}
+
+		public ProgrammeBuilder withDesc(String desc) {
+			programmeDoc.setDescription(desc);
+			return this;
+		}
+
+		public ProgrammeBuilder withStopPlus(int minutes) {
+			programmeDoc.setStop(ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(minutes).withSecond(0).withNano(0));
+			return this;
+		}
+
+		public ProgrammeBuilder withChannel(String channel) {
+			programmeDoc.setChannel(channel);
+			return this;
+		}
+
+		public ProgrammeDoc build() {
+
+			return programmeDoc;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return progId + ", " + description + ", " + channel + ", " + start + ", " + stop;
+	}
 }
