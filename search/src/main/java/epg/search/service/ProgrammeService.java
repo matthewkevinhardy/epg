@@ -43,7 +43,7 @@ public class ProgrammeService {
 	@Cacheable(value = "nowCache", unless = "#result==null")
 	public Optional<ProgrammeDoc> now(String channel) {
 
-		return programmeRepo.findNow(QueryUtils.escape(channel), ZonedDateTime.now(ZoneOffset.UTC));
+		return programmeRepo.findNow(QueryUtils.escape(channel), ZonedDateTime.now(ZoneOffset.UTC).withNano(0));
 	}
 
 	@Cacheable(value = "nowAndNextCache", unless = "#result.isEmpty")
@@ -51,12 +51,14 @@ public class ProgrammeService {
 
 		ProgDocList nowNextList = new ProgDocList();
 
-		programmeRepo.findNow(QueryUtils.escape(channel), ZonedDateTime.now(ZoneOffset.UTC)).ifPresent(nowDoc -> {
-			nowNextList.add(nowDoc);
-			programmeRepo.findByChannelAndStart(QueryUtils.escape(channel), nowDoc.getStop()).ifPresent(nextDoc -> {
-				nowNextList.add(nextDoc);
-			});
-		});
+		programmeRepo.findNow(QueryUtils.escape(channel), ZonedDateTime.now(ZoneOffset.UTC).withNano(0))
+				.ifPresent(nowDoc -> {
+					nowNextList.add(nowDoc);
+					programmeRepo.findByChannelAndStart(QueryUtils.escape(channel), nowDoc.getStop())
+							.ifPresent(nextDoc -> {
+								nowNextList.add(nextDoc);
+							});
+				});
 
 		return nowNextList;
 	}
