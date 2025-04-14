@@ -15,8 +15,8 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 	@Query("{\"bool\":{\"must\":[{\"query_string\":{\"default_operator\":\"and\",\"fields\":[\"channel\"],\"query\":\"?0\"}},{\"bool\":{\"should\":[{\"range\":{\"start\":{\"gte\":\"?1\",\"lte\":\"?2\"}}},{\"range\":{\"stop\":{\"gte\":\"?1\",\"lte\":\"?2\"}}},  {\"bool\": {\"must\": [{ \"range\": { \"start\": { \"lt\": \"now\" } } },{ \"range\": { \"stop\": { \"gt\": \"now\" } } }]}}  ]}}]}}")
 	public Page<ProgrammeDoc> findInTimeSlot(String channel, ZonedDateTime begin, ZonedDateTime end, Pageable pageable);
 
-	@Query("{\"bool\":{\"must\":[{\"query_string\":{\"default_operator\":\"and\",\"fields\":[\"channel\"],\"query\":\"?0\"}},{\"range\":{\"start\":{\"lte\":\"now/d\"}}},{\"range\":{\"stop\":{\"gte\":\"now/d\"}}}]}}")
-	public Optional<ProgrammeDoc> findNow(String channel);
+	@Query("{\"bool\":{\"must\":[{\"query_string\":{\"default_operator\":\"and\",\"fields\":[\"channel\"],\"query\":\"?0\"}},{\"range\":{\"start\":{\"lte\":\"?1\"}}},{\"range\":{\"stop\":{\"gte\":\"?1\"}}}]}}")
+	public Optional<ProgrammeDoc> findNow(String channel, ZonedDateTime now);
 
 	public Optional<ProgrammeDoc> findByChannelAndStart(String channel, ZonedDateTime start);
 
