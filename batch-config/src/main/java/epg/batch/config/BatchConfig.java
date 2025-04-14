@@ -157,8 +157,9 @@ public class BatchConfig {
 					doc.setRatingSystem(item.getRating().getSystem());
 					doc.setRatingValue(item.getRating().getValue());
 				}
-				doc.setStart(ZonedDateTime.parse(item.getStart(), dateTimeFormatter));
-				doc.setStop(ZonedDateTime.parse(item.getStop(), dateTimeFormatter));
+				doc.setStart(
+						ZonedDateTime.parse(item.getStart(), dateTimeFormatter).withZoneSameInstant(ZoneOffset.UTC));
+				doc.setStop(ZonedDateTime.parse(item.getStop(), dateTimeFormatter).withZoneSameInstant(ZoneOffset.UTC));
 				doc.setTitle(item.getTitle().getValue());
 				if (item.getCredits() != null)
 					doc.setCredits(item.getCredits().stream().map(Credits::getActor).collect(Collectors.toList()));
