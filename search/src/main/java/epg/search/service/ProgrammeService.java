@@ -47,7 +47,7 @@ public class ProgrammeService {
 	}
 
 	public Page<ProgrammeDoc> now(List<String> channels, Pageable pageable) {
-		return programmeRepo.findNow(channels.stream().map(c -> QueryUtils.escape(c)).toList(), pageable);
+		return programmeRepo.findNow(channels.stream().map(QueryUtils::escape).toList(), pageable);
 	}
 
 	@Cacheable(value = "nowAndNextCache", unless = "#result.isEmpty")
