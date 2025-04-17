@@ -47,6 +47,12 @@ public class ProgrammeController {
 		return ResponseEntity.of(programmeService.now(channel));
 	}
 
+	@GetMapping(path = "/nowChannels", produces = APPLICATION_JSON_VALUE)
+	public ResponseEntity<Page<ProgrammeDoc>> now(@RequestParam(required = true) List<String> channel,
+			@PageableDefault(sort = { "channel" }, direction = Direction.ASC) final Pageable pageable) {
+		return ResponseEntity.ok(programmeService.now(channel, pageable));
+	}
+
 	@GetMapping(path = "/nowAndNext", produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<ProgrammeDoc>> nowAndNext(@RequestParam(required = true) String channel) {
 
