@@ -21,3 +21,4 @@ Data from ElasticSearch made available via a webservice hosted within Spring Boo
 - [https://mkhardy.co.uk/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk](https://mkhardy.co.uk/epg/v1/programme/now?channel=BBC.One.Lon.HD.uk)
 - [https://mkhardy.co.uk/epg/v1/programme/nextHour?channel=ITV1.HD.uk](https://mkhardy.co.uk/epg/v1/programme/nextHour?channel=ITV1.HD.uk)
 - [https://mkhardy.co.uk/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk](https://mkhardy.co.uk/epg/v1/programme/nowAndNext?channel=Channel.5.HD.uk)
+- [https://mkhardy.co.uk/epg/v1/programme/nowChannels?channel=BBC.One.Lon.HD.uk&channel=ITV1.HD.uk](https://mkhardy.co.uk/epg/v1/programme/nowChannels?channel=BBC.One.Lon.HD.uk&channel=ITV1.HD.uk)
