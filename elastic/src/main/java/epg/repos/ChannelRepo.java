@@ -1,13 +1,13 @@
 package epg.repos;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.elasticsearch.repository.ReactiveElasticsearchRepository;
 
 import epg.documents.ChannelDoc;
+import reactor.core.publisher.Flux;
 
-public interface ChannelRepo extends ElasticsearchRepository<ChannelDoc, String> {
+public interface ChannelRepo extends ReactiveElasticsearchRepository<ChannelDoc, String> {
 
-	public Page<ChannelDoc> findByDisplayNameContainingOrIdContaining(String searchTermName, String searchTermId,
+	public Flux<ChannelDoc> findByDisplayNameContainingOrIdContaining(String searchTermName, String searchTermId,
 			Pageable pageable);
 }

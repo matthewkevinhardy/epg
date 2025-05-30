@@ -2,16 +2,16 @@ package epg.repos;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Query;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.elasticsearch.repository.ReactiveElasticsearchRepository;
 
 import epg.documents.ProgrammeDoc;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, String> {
+public interface ProgrammeRepo extends ReactiveElasticsearchRepository<ProgrammeDoc, String> {
 
 	@Query("""
 			{"bool":{
@@ -34,7 +34,7 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 				]
 			}
 			}""")
-	public Page<ProgrammeDoc> findInTimeSlot(String channel, ZonedDateTime begin, ZonedDateTime end, Pageable pageable);
+	public Flux<ProgrammeDoc> findInTimeSlot(String channel, ZonedDateTime begin, ZonedDateTime end, Pageable pageable);
 
 	@Query("""
 			{"bool":{
@@ -46,12 +46,12 @@ public interface ProgrammeRepo extends ElasticsearchRepository<ProgrammeDoc, Str
 				}
 			}
 			""")
-	public Page<ProgrammeDoc> findNow(List<String> channel, Pageable pageable);
+	public Flux<ProgrammeDoc> findNow(List<String> channel, Pageable pageable);
 
-	public Optional<ProgrammeDoc> findByChannelAndStart(String channel, ZonedDateTime start);
+	public Mono<ProgrammeDoc> findByChannelAndStart(String channel, ZonedDateTime start);
 
-	public Page<ProgrammeDoc> findByDescriptionContaining(String description, Pageable pageable);
+	public Flux<ProgrammeDoc> findByDescriptionContaining(String description, Pageable pageable);
 
-	public Page<ProgrammeDoc> findByDescriptionContainingAndDescriptionLang(String description, String descriptionLang,
+	public Flux<ProgrammeDoc> findByDescriptionContainingAndDescriptionLang(String description, String descriptionLang,
 			Pageable pageable);
 }
