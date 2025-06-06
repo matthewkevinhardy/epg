@@ -8,22 +8,30 @@ import java.util.function.Supplier;
 import org.ehcache.expiry.ExpiryPolicy;
 
 import epg.documents.ProgrammeDoc;
+import reactor.core.publisher.Mono;
 
-public class NowExpiryPolicy implements ExpiryPolicy<String, ProgrammeDoc> {
+public class NowExpiryPolicy implements ExpiryPolicy<String, Mono<ProgrammeDoc>> {
 
 	@Override
-	public Duration getExpiryForCreation(String key, ProgrammeDoc value) {
-		return Duration.between(ZonedDateTime.now(ZoneOffset.UTC), value.getStop());
+	public Duration getExpiryForCreation(String key, Mono<ProgrammeDoc> value) {
+		Mono<Duration> d = value.map(t -> {
+			return Duration.between(ZonedDateTime.now(ZoneOffset.UTC), t.getStop());
+			// return t;
+		});
+		return null;
 	}
 
 	@Override
-	public Duration getExpiryForAccess(String key, Supplier<? extends ProgrammeDoc> value) {
-		return Duration.between(ZonedDateTime.now(ZoneOffset.UTC), value.get().getStop());
+	public Duration getExpiryForAccess(String key, Supplier<? extends Mono<ProgrammeDoc>> value) {
+		// ZonedDateTime stop = value.get().map(t->t.getStop());
+		return null; // Duration.between(ZonedDateTime.now(ZoneOffset.UTC), value.get().map(t ->
+						// t.getStop()));
 	}
 
 	@Override
-	public Duration getExpiryForUpdate(String key, Supplier<? extends ProgrammeDoc> oldValue, ProgrammeDoc newValue) {
-		return Duration.between(ZonedDateTime.now(ZoneOffset.UTC), newValue.getStop());
+	public Duration getExpiryForUpdate(String key, Supplier<? extends Mono<ProgrammeDoc>> oldValue,
+			Mono<ProgrammeDoc> newValue) {
+		return null;// Duration.between(ZonedDateTime.now(ZoneOffset.UTC), newValue.getStop());
 	}
 
 }

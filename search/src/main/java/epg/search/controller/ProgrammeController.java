@@ -5,7 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import epg.documents.ProgrammeDoc;
 import epg.search.service.ProgrammeService;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/v1/programme")
@@ -27,7 +29,7 @@ public class ProgrammeController {
 	private ProgrammeService programmeService;
 
 	@GetMapping(path = "/description/{desc}", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProgrammeDoc>> byDescription(@PathVariable String desc,
+	public ResponseEntity<Flux<ProgrammeDoc>> byDescription(@PathVariable String desc,
 			@RequestParam(required = false) String lang,
 			@PageableDefault(sort = { "start" }, direction = Direction.ASC) Pageable pageable) {
 
@@ -35,7 +37,7 @@ public class ProgrammeController {
 	}
 
 	@GetMapping(path = "/nextHour", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProgrammeDoc>> byChannel(@RequestParam(required = true) String channel,
+	public ResponseEntity<Flux<ProgrammeDoc>> byChannel(@RequestParam(required = true) String channel,
 			@PageableDefault(sort = { "start" }, direction = Direction.ASC) final Pageable pageable) {
 
 		return ResponseEntity.ok(programmeService.nextHour(channel, pageable));
@@ -43,12 +45,13 @@ public class ProgrammeController {
 	}
 
 	@GetMapping(path = "/now", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<ProgrammeDoc> now(@RequestParam(required = true) String channel, Pageable pageable) {
-		return ResponseEntity.of(programmeService.now(channel));
+	public ResponseEntity<Mono<ProgrammeDoc>> now(@RequestParam(required = true) String channel) {
+		Pageable pageable = PageRequest.of(1, 1);
+		return ResponseEntity.ok(programmeService.now(channel));
 	}
 
 	@GetMapping(path = "/nowChannels", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProgrammeDoc>> now(@RequestParam(required = true) List<String> channel,
+	public ResponseEntity<Flux<ProgrammeDoc>> now(@RequestParam(required = true) List<String> channel,
 			@PageableDefault(sort = { "channel" }, direction = Direction.ASC) final Pageable pageable) {
 		return ResponseEntity.ok(programmeService.now(channel, pageable));
 	}
@@ -60,9 +63,9 @@ public class ProgrammeController {
 	}
 
 	@GetMapping(path = "/today", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProgrammeDoc>> today(@RequestParam(required = true) String channel,
-			@PageableDefault(sort = { "start" }, direction = Direction.ASC) final Pageable pageable) {
+	public ResponseEntity<Flux<ProgrammeDoc>> today(@RequestParam(required = true) String channel) {
 
+		Pageable pageable = PageRequest.of(1, 1);
 		return ResponseEntity.ok(programmeService.today(channel, pageable));
 	}
 }

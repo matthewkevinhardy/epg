@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -37,45 +36,31 @@ public class ProgrammeService {
 	public Flux<ProgrammeDoc> nextHour(String channel, Pageable pageable) {
 
 		return programmeRepo.findInTimeSlot(QueryUtils.escape(channel), ZonedDateTime.now(ZoneOffset.UTC).withNano(0),
-				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).withNano(0), pageable);
+				ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).withNano(0), pageable.getSort());
 
 	}
 
-	@Cacheable(value = "nowCache", unless = "#result==null")
-	public Flux<ProgrammeDoc> now(String channel) {
-		return programmeRepo.findNow(List.of(QueryUtils.escape(channel)), Pageable.unpaged());
+	// @Cacheable(value = "nowCache", unless = "#result==null")
+	public Mono<ProgrammeDoc> now(String channel) {
+		return programmeRepo.findNow(List.of(QueryUtils.escape(channel))).next();
 	}
 
 	public Flux<ProgrammeDoc> now(List<String> channels, Pageable pageable) {
-		return programmeRepo.findNow(channels.stream().map(QueryUtils::escape).toList(), pageable);
+		return programmeRepo.findNow(channels.stream().map(QueryUtils::escape).toList());
 	}
 
-	@Cacheable(value = "nowAndNextCache", unless = "#result.isEmpty")
+	// @Cacheable(value = "nowAndNextCache", unless = "#result.isEmpty")
 	public ProgDocList nowAndNext(String channel) {
 
 		ProgDocList nowNextList = new ProgDocList();
-
-//		programmeRepo.findNow(List.of(QueryUtils.escape(channel)), Pageable.unpaged()).get().findFirst()
-//				.ifPresent(nowDoc -> {
-//					nowNextList.add(nowDoc);
-//					programmeRepo.findByChannelAndStart(QueryUtils.escape(channel), nowDoc.getStop())
-//							.ifPresent(nextDoc -> {
-//								nowNextList.add(nextDoc);
-//							});
-//				});
-
-		Flux<ProgrammeDoc> nowDoc = programmeRepo.findNow(List.of(QueryUtils.escape(channel)), Pageable.unpaged());
-
-		nowDoc.map(now -> {
-			nowNextList.add(now);
-			return now;
-		}).map(now -> {
-			Mono<ProgrammeDoc> nextDoc = programmeRepo.findByChannelAndStart(QueryUtils.escape(channel), now.getStop());
-			nextDoc.map(next -> {
-				nowNextList.add(next);
-				return next;
+		programmeRepo.findNow(List.of(QueryUtils.escape(channel))).map(nowResponse -> {
+			nowNextList.add(nowResponse);
+			programmeRepo.findByChannelAndStart(channel, nowResponse.getStop()).map(nextResponse -> {
+				nowNextList.add(nextResponse);
+				return nextResponse;
 			});
-			return now;
+
+			return nowResponse;
 		});
 
 		return nowNextList;
@@ -85,7 +70,7 @@ public class ProgrammeService {
 
 		return programmeRepo.findInTimeSlot(QueryUtils.escape(channel),
 				ZonedDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, ZoneOffset.UTC),
-				ZonedDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, ZoneOffset.UTC), pageable);
+				ZonedDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, ZoneOffset.UTC), pageable.getSort());
 	}
 
 }

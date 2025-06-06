@@ -33,15 +33,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileUrlResource;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.elasticsearch.repository.ReactiveElasticsearchRepository;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Conflicts;
-import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
-import co.elastic.clients.json.JsonData;
 import epg.batch.config.tasklet.DownloadAndUnzipFileTasklet;
 import epg.batch.config.xml.Category;
 import epg.batch.config.xml.Channel;
@@ -240,7 +240,7 @@ public class BatchConfig {
 	 * @param repo
 	 * @return
 	 */
-	private <T, ID> ItemWriter<T> writer(ElasticsearchRepository<T, ID> repo) {
+	private <T, ID> ItemWriter<T> writer(ReactiveElasticsearchRepository<T, ID> repo) {
 		return new ItemWriter<T>() {
 
 			@Override
@@ -291,7 +291,7 @@ public class BatchConfig {
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				DeleteByQueryRequest dbyquery = DeleteByQueryRequest.of(fn -> fn.conflicts(Conflicts.Proceed)
-						.query(RangeQuery.of(rq -> rq.field("stop").lt(JsonData.of("now/d")))._toQuery())
+						.query(DateRangeQuery.of(drq -> drq.field("stop").lt("now/d"))._toRangeQuery())
 						.index("programme"));
 
 				DeleteByQueryResponse dqr = elasticsearchClient.deleteByQuery(dbyquery);

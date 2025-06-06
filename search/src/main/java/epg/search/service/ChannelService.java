@@ -2,7 +2,6 @@ package epg.search.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import epg.documents.ChannelDoc;
@@ -20,8 +19,8 @@ public class ChannelService {
 		return channelRepo.findByDisplayNameContainingOrIdContaining(searchTerm, searchTerm, pageable);
 	}
 
-	public Flux<ChannelDoc> findAll(Sort sort) {
+	public Flux<ChannelDoc> findAll(Pageable pageable) {
 
-		return channelRepo.findAll(sort);
+		return channelRepo.findAll(pageable.getSort());
 	}
 }

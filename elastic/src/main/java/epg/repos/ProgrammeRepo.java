@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ReactiveElasticsearchRepository;
 
@@ -34,7 +35,7 @@ public interface ProgrammeRepo extends ReactiveElasticsearchRepository<Programme
 				]
 			}
 			}""")
-	public Flux<ProgrammeDoc> findInTimeSlot(String channel, ZonedDateTime begin, ZonedDateTime end, Pageable pageable);
+	public Flux<ProgrammeDoc> findInTimeSlot(String channel, ZonedDateTime begin, ZonedDateTime end, Sort pageable);
 
 	@Query("""
 			{"bool":{
@@ -46,7 +47,7 @@ public interface ProgrammeRepo extends ReactiveElasticsearchRepository<Programme
 				}
 			}
 			""")
-	public Flux<ProgrammeDoc> findNow(List<String> channel, Pageable pageable);
+	public Flux<ProgrammeDoc> findNow(List<String> channel);
 
 	public Mono<ProgrammeDoc> findByChannelAndStart(String channel, ZonedDateTime start);
 
